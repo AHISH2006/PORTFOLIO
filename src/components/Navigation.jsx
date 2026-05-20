@@ -1,123 +1,179 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useIsMobile } from '../hooks/use-mobile';
 import '../styles/Navigation.css';
 
-
 export default function Navigation() {
-  const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const isMobile = useIsMobile();
+  const [scrolled, setScrolled]           = useState(false);
+  const [menuOpen, setMenuOpen]           = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'about', 'skills', 'projects', 'contact'];
-      const scrollY = window.scrollY;
-
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollY >= offsetTop - 100 && scrollY < offsetTop + offsetHeight - 100) {
-            setActiveSection(section);
+      setScrolled(window.scrollY > 50);
+      const sections = ['home', 'about', 'skills', 'projects', 'experience', 'contact'];
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            setActiveSection(id);
             break;
           }
         }
       }
     };
-
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when screen size changes from mobile to desktop
+  // Close menu on resize ≥ 768px
   useEffect(() => {
-    if (!isMobile && isOpen) {
-      setIsOpen(false);
-    }
-  }, [isMobile, isOpen]);
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    setIsOpen(false);
-  };
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
   const navItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'contact', label: 'Contact' },
+    { id: 'home',       label: 'HOME'       },
+    { id: 'about',      label: 'ABOUT ME'   },
+    { id: 'skills',     label: 'SKILLS'     },
+    { id: 'projects',   label: 'PROJECTS'   },
+    { id: 'experience', label: 'EXPERIENCE' },
   ];
+
+  const scrollTo = (id) => {
+    setMenuOpen(false);
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
 
   return (
     <>
-<motion.nav
-  animate={{ transform: 'translateY(0)' }}
-  transition={{ duration: 0.5, ease: 'easeOut' }}
-  className="navbar" 
->
-        <div className="nav-container">
-          <div className="nav-logo">AHISH | Portfolio</div>
+      {/* ── Top Bar ─────────────────────────────── */}
+      <nav className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}>
+        <div className="navbar-inner">
 
-          {/* Desktop Navigation */}
-          <div className="nav-links-desktop">
+          {/* Logo */}
+          <a href="#home" className="navbar-logo" onClick={(e) => { e.preventDefault(); scrollTo('home'); }}>
+            AHISH<span className="navbar-logo-dot">.</span>
+          </a>
+
+          {/* Desktop pill nav */}
+          <div className={`navbar-pill ${scrolled ? 'navbar-pill-active' : ''}`}>
             {navItems.map((item) => (
-              <button
+              <a
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
+                href={`#${item.id}`}
+                onClick={(e) => { e.preventDefault(); scrollTo(item.id); }}
+                className={`navbar-pill-item ${activeSection === item.id ? 'navbar-pill-item-active' : ''}`}
               >
                 {item.label}
-              </button>
+              </a>
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Desktop CTA */}
+          <a
+            href="#contact"
+            onClick={(e) => { e.preventDefault(); scrollTo('contact'); }}
+            className="navbar-cta"
+          >
+            START CONVERSATION
+          </a>
+
+          {/* Mobile hamburger */}
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`menu-toggle ${isOpen ? 'open' : ''}`}
+            className={`navbar-hamburger ${menuOpen ? 'navbar-hamburger-open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
-            <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
+            <span className="hamburger-line" />
+            <span className="hamburger-line" />
+            <span className="hamburger-line" />
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
-      {/* Overlay */}
-      <div 
-        className={`nav-overlay ${isOpen ? 'show' : ''}`} 
-        onClick={() => setIsOpen(false)} 
-      />
-
-      {/* Sidebar Mobile Menu */}
+      {/* ── Mobile Drawer (Remix-style left panel) ── */}
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="nav-sidebar"
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ 
-              type: 'spring', 
-              stiffness: 300, 
-              damping: 30,
-              duration: 0.4 
-            }}
-          >
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
+        {menuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="mobile-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setMenuOpen(false)}
+            />
+
+            {/* Drawer panel */}
+            <motion.aside
+              className="mobile-drawer"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Drawer header */}
+              <div className="mobile-drawer-header">
+                <span className="mobile-drawer-logo">
+                  AHISH<span className="navbar-logo-dot">.</span>
+                </span>
+                <button
+                  className="mobile-drawer-close"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Nav items */}
+              <nav className="mobile-drawer-nav">
+                {navItems.map((item, i) => (
+                  <motion.a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={(e) => { e.preventDefault(); scrollTo(item.id); }}
+                    className={`mobile-drawer-item ${activeSection === item.id ? 'mobile-drawer-item-active' : ''}`}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + i * 0.055, duration: 0.3 }}
+                  >
+                    {/* Left accent bar */}
+                    <span className="mobile-drawer-bar" />
+                    <span className="mobile-drawer-label">{item.label}</span>
+                  </motion.a>
+                ))}
+              </nav>
+
+              {/* CTA at bottom — bold like "START BUILDING" in the image */}
+              <motion.div
+                className="mobile-drawer-footer"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.42, duration: 0.3 }}
               >
-                {item.label}
-              </button>
-            ))}
-          </motion.div>
+                <a
+                  href="#contact"
+                  onClick={(e) => { e.preventDefault(); scrollTo('contact'); }}
+                  className="mobile-drawer-cta"
+                >
+                  START CONVERSATION
+                </a>
+              </motion.div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
     </>

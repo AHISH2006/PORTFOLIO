@@ -1,0 +1,278 @@
+/* ═══════════════════════════════════════════════
+   LANYARD CARD — CSS + R3F Canvas Styles
+   ═══════════════════════════════════════════════ */
+.lanyard-wrapper {
+  background:
+    radial-gradient(circle at center,
+      rgba(34,197,94,0.12),
+      rgba(2,6,23,0.2));
+
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.lanyard-wrapper:active {
+  cursor: grabbing;
+}
+
+.lanyard-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+/* ── Scene container ──────────────────────────── */
+.lanyard-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* no pointer-events block so drag works */
+  user-select: none;
+}
+
+/* ── Ceiling mount ─────────────────────────────── */
+.lanyard-mount {
+  width: 48px;
+  height: 18px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.lanyard-nail {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d1d5db, #6b7280);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+}
+
+/* ── Rope ─────────────────────────────────────── */
+.lanyard-rope-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.lanyard-rope {
+  width: 12px;
+  height: clamp(48px, 9vw, 80px);
+  background: repeating-linear-gradient(
+    180deg,
+    #22c55e 0px,
+    #22c55e 3px,
+    #166534 3px,
+    #166534 6px,
+    #15803d 6px,
+    #15803d 9px,
+    #166534 9px,
+    #166534 12px
+  );
+  border-radius: 0 0 2px 2px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.4), -2px 0 6px rgba(0,0,0,0.4);
+}
+
+/* ── Draggable card ────────────────────────────── */
+.lanyard-card {
+  position: relative;
+  width: clamp(180px, 42vw, 240px);
+  cursor: grab;
+  z-index: 10;
+  flex-shrink: 0;
+  /* Natural drop shadow */
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.55))
+          drop-shadow(0 4px 12px rgba(34,197,94,0.15));
+}
+
+.lanyard-card:active { cursor: grabbing; }
+
+/* ── Metal clip ──────────────────────────────── */
+.lanyard-clip {
+  width: 28px;
+  height: 22px;
+  background: linear-gradient(180deg, #9ca3af 0%, #6b7280 50%, #9ca3af 100%);
+  border-radius: 3px 3px 0 0;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+}
+
+.lanyard-clip-hole {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0f172a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* ── Card body ────────────────────────────────── */
+.lanyard-card-inner {
+  background: linear-gradient(160deg, #0d1a2d 0%, #050e1a 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(34,197,94,0.18);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── Top bar ──────────────────────────────────── */
+.lanyard-card-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #22c55e;
+}
+
+.lanyard-card-badge {
+  font-size: 0.5rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: #000;
+  text-transform: uppercase;
+}
+
+.lanyard-card-id {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
+  letter-spacing: 0.1em;
+}
+
+/* ── Photo ────────────────────────────────────── */
+.lanyard-card-photo-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.lanyard-card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  pointer-events: none;
+  /* Slight green tint overlay via mix-blend-mode */
+}
+
+.lanyard-card-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 55%,
+    rgba(5, 14, 26, 0.95) 100%
+  );
+}
+
+/* ── Footer info ──────────────────────────────── */
+.lanyard-card-footer {
+  padding: 0.65rem 0.75rem 0.75rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(34,197,94,0.04) 100%);
+  border-top: 1px solid rgba(34,197,94,0.12);
+}
+
+.lanyard-card-name {
+  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.2rem;
+  line-height: 1.1;
+}
+
+.lanyard-card-role {
+  font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+  font-weight: 600;
+  color: #22c55e;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.lanyard-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.lanyard-card-tags span {
+  font-size: 0.45rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  color: #4ade80;
+  text-transform: uppercase;
+}
+
+/* ── Drag hint ─────────────────────────────────── */
+.lanyard-hint {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(34,197,94,0.4);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lanyard-hint span {
+  font-size: 0.75rem;
+  color: rgba(34,197,94,0.6);
+  animation: hintBounce 2s ease-in-out infinite;
+}
+
+@keyframes hintBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 480px) {
+  .lanyard-card {
+    width: clamp(160px, 52vw, 210px);
+  }
+
+  .lanyard-rope {
+    height: 52px;
+    width: 10px;
+  }
+
+  .lanyard-mount {
+    width: 40px;
+    height: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  .lanyard-card {
+    width: 155px;
+  }
+}

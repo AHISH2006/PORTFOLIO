@@ -1,6 +1,6 @@
 import { Switch, Route } from "wouter";
-import Portfolio from "./pages/Portfolio.jsx";
-import NotFound from "./pages/not-found.jsx";
+import Portfolio from "./pages/Portfolio";
+import NotFound from "./pages/not-found";
 
 function Router() {
   return (

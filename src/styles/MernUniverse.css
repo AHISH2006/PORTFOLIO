@@ -1,0 +1,123 @@
+/* ═══════════════════════════════════════════════
+   MERN UNIVERSE — OGL Galaxy Background System
+   WebGL GLSL canvas + CSS aurora nebula blobs
+   ═══════════════════════════════════════════════ */
+
+/* ── Wrapper: fixed full-screen behind everything */
+.mern-universe-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  overflow: hidden;
+  background: #020617;        /* deep-space base, canvas renders on top */
+}
+
+/* ── OGL canvas host ─────────────────────────── */
+.mern-universe-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* canvas is appended here via JS */
+}
+
+.mern-universe-container canvas,
+.galaxy-container canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Nebula aurora CSS blobs — MERN Tech Colors ─ */
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: nebulaFloat 18s ease-in-out infinite;
+}
+
+/* MongoDB Green — top-left (hero highlight) */
+.nebula-1 {
+  width: clamp(320px, 55vw, 900px);
+  height: clamp(220px, 40vw, 650px);
+  top: -8%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.20) 0%, transparent 70%);
+  filter: blur(110px);
+  animation-duration: 20s;
+  animation-delay: 0s;
+  opacity: 0;
+}
+
+/* Soft Pink — bottom-right (secondary) */
+.nebula-2 {
+  width: clamp(260px, 50vw, 750px);
+  height: clamp(200px, 40vw, 650px);
+  bottom: -5%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(251, 113, 133, 0.14) 0%, transparent 70%);
+  filter: blur(100px);
+  animation-duration: 22s;
+  animation-delay: -6s;
+  opacity: 0;
+}
+
+/* Rose-red — centre (secondary) */
+.nebula-3 {
+  width: clamp(180px, 32vw, 550px);
+  height: clamp(180px, 32vw, 550px);
+  top: 38%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.10) 0%, transparent 70%);
+  filter: blur(90px);
+  animation-duration: 24s;
+  animation-delay: -11s;
+  opacity: 0;
+}
+
+/* Blush pink — top-right (secondary light) */
+.nebula-4 {
+  width: clamp(200px, 36vw, 580px);
+  height: clamp(200px, 36vw, 580px);
+  top: 6%;
+  right: 6%;
+  background: radial-gradient(circle, rgba(244, 114, 182, 0.12) 0%, transparent 70%);
+  filter: blur(90px);
+  animation-duration: 17s;
+  animation-delay: -4s;
+  opacity: 0;
+}
+
+/* ── Keyframes ───────────────────────────────── */
+@keyframes nebulaFloat {
+  0%   { opacity: 0;    transform: scale(0.82) translateY(0px);   }
+  15%  { opacity: 1; }
+  50%  { opacity: 0.85; transform: scale(1.14) translateY(-22px); }
+  85%  { opacity: 0.90; }
+  100% { opacity: 0;    transform: scale(0.82) translateY(0px);   }
+}
+
+/* ── Responsive tweaks ───────────────────────── */
+@media (max-width: 1024px) {
+  .nebula {
+    filter: blur(80px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .nebula {
+    filter: blur(60px) !important;
+  }
+  /* Reduce nebula count on mobile for performance */
+  .nebula-3 { display: none; }
+}
+
+@media (max-width: 480px) {
+  .nebula-4 { display: none; }
+  .nebula-2 { opacity: 0.7; }
+}

@@ -1,92 +1,239 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ========== THEME VARIABLES ========== */
+/* ========================================================= */
+/* ROOT THEME VARIABLES */
+/* ========================================================= */
+
 :root {
-  /* Colors */
-  --background: hsl(222, 84%, 5%);
-  --foreground: hsl(210, 40%, 98%);
-  --card: hsl(215, 28%, 17%);
-  --card-foreground: hsl(210, 40%, 98%);
-  --primary: hsl(239, 84%, 67%);
-  --primary-foreground: #fff;
-  --secondary: hsl(263, 70%, 68%);
-  --secondary-foreground: #fff;
-  --accent: hsl(187, 96%, 43%);
-  --accent-foreground: hsl(222, 84%, 5%);
-  --muted: hsl(215, 28%, 17%);
-  --muted-foreground: hsl(218, 11%, 65%);
-  --border: hsl(217, 33%, 18%);
-  --ring: hsl(239, 84%, 67%);
-
-  /* Fonts & Radius */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --radius: 1rem;
-
-  /* Surfaces */
-  --surface: hsl(215, 28%, 17%);
+  --background:  #020617;
+  --foreground:  #f8fafc;
+  --primary:     #22c55e;
+  --accent:      #4ade80;
+  --muted:       #64748b;
+  --border:      rgba(255,255,255,0.07);
+  --radius:      1rem;
+  --font-sans:   'Inter', system-ui, -apple-system, sans-serif;
+  --shadow-soft:        0 4px 24px rgba(0,0,0,0.3);
+  --shadow-green-strong: 0 0 60px rgba(34,197,94,0.35), 0 8px 32px rgba(0,0,0,0.5);
 }
 
-/* Dark mode */
-.dark {
-  --background: hsl(222, 84%, 5%);
-  --foreground: hsl(210, 40%, 98%);
-}
+/* ========================================================= */
+/* RESET & BASE */
+/* ========================================================= */
 
-/* ========== BASE STYLES ========== */
-* {
+*, *::before, *::after {
   box-sizing: border-box;
-  border-color: var(--border);
+  margin: 0;
+  padding: 0;
 }
-
+html,
+body,
+#root,
+.portfolio-root,
+.main-content,
+section,
+.cinematic-section,
+.hero-section {
+  position: relative;
+}
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
   font-family: var(--font-sans);
   background-color: var(--background);
   color: var(--foreground);
-  margin: 0;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
-img {
+img, video {
   max-width: 100%;
   display: block;
-  border-radius: var(--radius);
 }
 
-/* Sections */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+.background-layer {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: -3;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.main-content {
+  position: relative;
+  z-index: 5;
+}
+
+/* ========================================================= */
+/* PORTFOLIO ROOT */
+/* ========================================================= */
+
+.portfolio-root {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: visible;
+
+  background: var(--background);
+  color: var(--foreground);
+
+  isolation: isolate;
+}
+
+/* Vignette overlay */
+.portfolio-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 0%, rgba(2, 6, 23, 0.85) 100%);
+  pointer-events: none;
+  z-index: -4;
+}
+
+.main-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================================= */
+/* NOISE / GRAIN OVERLAY */
+/* ========================================================= */
+
+.noise-overlay {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-5%, -10%); }
+  20%  { transform: translate(-15%, 5%); }
+  30%  { transform: translate(7%, -25%); }
+  40%  { transform: translate(-5%, 25%); }
+  50%  { transform: translate(-15%, 10%); }
+  60%  { transform: translate(15%, 0); }
+  70%  { transform: translate(0, 15%); }
+  80%  { transform: translate(3%, 35%); }
+  90%  { transform: translate(-10%, 10%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ========================================================= */
+/* SECTIONS */
+/* ========================================================= */
+
 .section {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 4rem 2rem;
+  padding: 5rem 1.5rem;
+  position: relative;
 }
 
-/* Containers */
+.cinematic-section {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 7rem 0;
+
+  overflow: visible;
+
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+@media (max-width: 768px) {
+  .noise-overlay {
+    opacity: 0.015;
+  }
+
+  .cinematic-section {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+/* ========================================================= */
+/* CONTAINER */
+/* ========================================================= */
+
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1300px;
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-/* ========== REUSABLE EFFECTS ========== */
+/* ========================================================= */
+/* GLASSMORPHISM */
+/* ========================================================= */
+
 .glassmorphism {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 32, 24, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
+
+/* ========================================================= */
+/* GRADIENT TEXT */
+/* ========================================================= */
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  background: linear-gradient(135deg, #22c55e, #10b981, #4ade80, #22c55e);
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: gradientShift 8s ease infinite;
 }
+
+/* ========================================================= */
+/* NAV LINK (utility) */
+/* ========================================================= */
 
 .nav-link {
   position: relative;
   padding: 0.5rem 0;
+  color: var(--foreground);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--accent);
 }
 
 .nav-link::after {
@@ -96,32 +243,81 @@ img {
   left: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  transition: left 0.3s ease;
+  background: linear-gradient(90deg, #22c55e, #10b981);
+  transition: left 0.4s ease;
 }
 
 .nav-link:hover::after {
   left: 0;
 }
 
-/* ========== PROJECT CARDS ========== */
+/* ========================================================= */
+/* PROJECT CARDS */
+/* ========================================================= */
+
 .project-card {
-  background: var(--card);
+  background: linear-gradient(145deg, rgba(20, 40, 30, 0.95), rgba(15, 25, 20, 0.95));
+  border: 1px solid rgba(74, 222, 128, 0.08);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+  box-shadow: var(--shadow-soft);
 }
 
 .project-card:hover {
-  transform: translateY(-10px) scale(1.02);
+  transform: translateY(-10px) scale(1.01);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: var(--shadow-green-strong);
 }
 
-/* ========== SKILLS ========== */
+/* ========================================================= */
+/* SKILL BAR */
+/* ========================================================= */
+
 .skill-bar {
+  background: linear-gradient(90deg, #22c55e, #10b981, #4ade80);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.45);
   transition: width 1.5s ease-in-out;
 }
 
-/* ========== ANIMATIONS ========== */
+/* ========================================================= */
+/* BUTTONS */
+/* ========================================================= */
+
+.btn-glow {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
+  transition: box-shadow 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 35px rgba(34, 197, 94, 0.6);
+}
+
+/* ========================================================= */
+/* SCROLLBAR */
+/* ========================================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#22c55e, #10b981);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#4ade80, #22c55e);
+}
+
+/* ========================================================= */
+/* ANIMATIONS */
+/* ========================================================= */
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -134,28 +330,105 @@ img {
   animation: fadeIn 1s ease-out;
 }
 
+/* ========================================================= */
+/* KEYFRAMES */
+/* ========================================================= */
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
+  50%       { transform: translateY(-15px); }
 }
 
 @keyframes glow {
-  0% { text-shadow: 0 0 20px var(--primary); }
-  100% { text-shadow: 0 0 40px var(--secondary), 0 0 50px var(--accent); }
+  0%   { text-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
+  100% { text-shadow: 0 0 35px rgba(34, 197, 94, 0.9), 0 0 50px rgba(16, 185, 129, 0.7); }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0px);  }
 }
 
-/* ========== RESPONSIVENESS ========== */
-@media (max-width: 768px) {
-  .section {
-    padding: 3rem 1.2rem;
+@keyframes gradientShift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* ========================================================= */
+/* RESPONSIVE — TABLET (max 1024px) */
+/* ========================================================= */
+
+@media (max-width: 1024px) {
+  .cinematic-section {
+    padding: 6rem 0;
   }
 
-  h1 {
-    font-size: 2rem;
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
+/* ========================================================= */
+/* RESPONSIVE — MOBILE (max 768px) */
+/* ========================================================= */
+
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .section {
+    padding: 4rem 1.2rem;
+  }
+
+  .cinematic-section {
+    padding: 5rem 0;
+    min-height: auto;
+    /* Sections don't force full-viewport height on mobile */
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem;   }
+  h3 { font-size: 1.5rem; }
+
+  ::-webkit-scrollbar { width: 4px; }
+}
+
+/* ========================================================= */
+/* RESPONSIVE — SMALL MOBILE (max 480px) */
+/* ========================================================= */
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 3rem 1rem;
+  }
+
+  .cinematic-section {
+    padding: 4rem 0;
+  }
+
+  h1 { font-size: 2rem;  }
+  h2 { font-size: 1.75rem; }
+  h3 { font-size: 1.3rem; }
+
+  ::-webkit-scrollbar { width: 3px; }
+}
+
+/* ========================================================= */
+/* RESPONSIVE — VERY SMALL (max 360px) */
+/* ========================================================= */
+
+@media (max-width: 360px) {
+  .cinematic-section {
+    padding: 3.5rem 0;
   }
 }
