@@ -74,10 +74,18 @@ function createLanyardTexture() {
    MAIN
 ───────────────────────────────────────────── */
 export default function LanyardCard() {
+
   const [isMobile, setIsMobile] =
     useState(false);
 
+  const [mounted, setMounted] =
+    useState(false);
+
+  /* ─────────────────────────────
+     MOBILE CHECK
+  ───────────────────────────── */
   useEffect(() => {
+
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -89,31 +97,50 @@ export default function LanyardCard() {
       handleResize
     );
 
-    return () =>
+    return () => {
       window.removeEventListener(
         'resize',
         handleResize
       );
+    };
+
   }, []);
+
+  /* ─────────────────────────────
+     CLIENT MOUNT CHECK
+  ───────────────────────────── */
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  /* ─────────────────────────────
+     PREVENT SSR / WEBGL ERRORS
+  ───────────────────────────── */
+  if (!mounted) return null;
 
   return (
     <div className="lanyard-wrapper">
       <Canvas
-        dpr={[1, isMobile ? 1.5 : 2]}
+        dpr={1}
+        shadows={false}
+        frameloop="always"
         camera={{
           position: [0, 0, 13],
           fov: 28,
         }}
-gl={{
-  antialias: true,
-  alpha: true,
-  powerPreference: 'high-performance',
-  preserveDrawingBuffer: false,
-}}
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: false,
+        }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
       >
         <ambientLight intensity={1.4} />
 
-        <Environment blur={0.8}>
+        <Environment resolution={128}>
           <Lightformer
             intensity={4}
             position={[0, 5, 5]}
@@ -135,7 +162,7 @@ gl={{
 
         <Physics
           gravity={[0, -35, 0]}
-          timeStep={1 / 60}
+          timeStep={1 / 45}
         >
           <Band isMobile={isMobile} />
         </Physics>
@@ -443,7 +470,12 @@ function Band({ isMobile }) {
           transparent
           depthTest={false}
           lineWidth={0.45}
-          resolution={[window.innerWidth, window.innerHeight]}
+          resolution={
+            new THREE.Vector2(
+              window.innerWidth,
+              window.innerHeight
+            )
+          }
           repeat={[-3, 1]}
         />
       </mesh>
