@@ -8,6 +8,7 @@ import {
   Environment,
   Lightformer,
   RoundedBox,
+  useTexture,
 } from '@react-three/drei';
 
 import {
@@ -24,6 +25,7 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 
 import '../../styles/LanyardCard.css';
+import meImg from '../../assets/me.png';
 
 extend({
   MeshLineGeometry,
@@ -35,38 +37,26 @@ extend({
 ───────────────────────────────────────────── */
 function createLanyardTexture() {
   const canvas = document.createElement('canvas');
-
   canvas.width = 512;
-  canvas.height = 64;
-
+  canvas.height = 128;
   const ctx = canvas.getContext('2d');
 
+  // Dark background
   ctx.fillStyle = '#050505';
-  ctx.fillRect(0, 0, 512, 64);
+  ctx.fillRect(0, 0, 512, 128);
 
+  // Green diagonal stripes
   ctx.strokeStyle = '#22c55e';
-  ctx.lineWidth = 8;
-
-  for (let i = -100; i < 600; i += 40) {
+  ctx.lineWidth = 16;
+  for (let i = -100; i < 600; i += 60) {
     ctx.beginPath();
     ctx.moveTo(i, 0);
-    ctx.lineTo(i + 40, 64);
+    ctx.lineTo(i + 80, 128);
     ctx.stroke();
   }
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 22px Arial';
-
-  for (let i = 0; i < 512; i += 120) {
-    ctx.fillText('AHISH', i, 42);
-  }
-
   const texture = new THREE.CanvasTexture(canvas);
-  
-
-  texture.wrapS = texture.wrapT =
-    THREE.RepeatWrapping;
-
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   return texture;
 }
 
@@ -120,12 +110,13 @@ export default function LanyardCard() {
 
   return (
     <div className="lanyard-wrapper">
+      <div className="lanyard-bg-text">Drag It!</div>
       <Canvas
         dpr={1}
         shadows={false}
         frameloop="always"
         camera={{
-          position: [0, 0, 13],
+          position: [0, 0, isMobile ? 18 : 13],
           fov: 28,
         }}
         gl={{
@@ -180,25 +171,25 @@ export default function LanyardCard() {
    BAND
 ───────────────────────────────────────────── */
 function Band({ isMobile }) {
-  const band = useRef();
+  const bandLeft = useRef();
+  const bandRight = useRef();
 
-  const fixed = useRef();
-  const j1 = useRef();
-  const j2 = useRef();
+  const fixedLeft = useRef();
+  const l1 = useRef();
+  const l2 = useRef();
+
+  const fixedRight = useRef();
+  const r1 = useRef();
+  const r2 = useRef();
+
   const j3 = useRef();
-
   const card = useRef();
 
-  const [hovered, setHovered] =
-    useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [dragged, setDragged] = useState(false);
 
-  const [dragged, setDragged] =
-    useState(false);
-
-  const texture = useMemo(
-    () => createLanyardTexture(),
-    []
-  );
+  const texture = useMemo(() => createLanyardTexture(), []);
+  const cardMap = useTexture(meImg);
 
   useEffect(() => {
     return () => {
@@ -206,7 +197,16 @@ function Band({ isMobile }) {
     };
   }, [texture]);
 
-  const curve = useMemo(() => {
+  const curveLeft = useMemo(() => {
+    return new THREE.CatmullRomCurve3([
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    ]);
+  }, []);
+
+  const curveRight = useMemo(() => {
     return new THREE.CatmullRomCurve3([
       new THREE.Vector3(),
       new THREE.Vector3(),
@@ -219,24 +219,17 @@ function Band({ isMobile }) {
   const dir = new THREE.Vector3();
 
   /* JOINTS */
-  useRopeJoint(
-    fixed,
-    j1,
-    [[0, 0, 0], [0, 0, 0], 1]
-  );
+  // Left side joints
+  useRopeJoint(fixedLeft, l1, [[0, 0, 0], [0, 0, 0], 0.6]);
+  useRopeJoint(l1, l2, [[0, 0, 0], [0, 0, 0], 0.6]);
+  useRopeJoint(l2, j3, [[0, 0, 0], [0, 0, 0], 0.6]);
 
-  useRopeJoint(
-    j1,
-    j2,
-    [[0, 0, 0], [0, 0, 0], 1]
-  );
+  // Right side joints
+  useRopeJoint(fixedRight, r1, [[0, 0, 0], [0, 0, 0], 0.6]);
+  useRopeJoint(r1, r2, [[0, 0, 0], [0, 0, 0], 0.6]);
+  useRopeJoint(r2, j3, [[0, 0, 0], [0, 0, 0], 0.6]);
 
-  useRopeJoint(
-    j2,
-    j3,
-    [[0, 0, 0], [0, 0, 0], 1]
-  );
-
+  // Spherical joint to connect meeting point j3 to the card clip
   useSphericalJoint(j3, card, [
     [0, 0, 0],
     [0, 1.45, 0],
@@ -258,22 +251,9 @@ function Band({ isMobile }) {
   /* FRAME */
   useFrame((state) => {
     if (dragged && card.current) {
-      vec.set(
-        state.pointer.x,
-        state.pointer.y,
-        0.5
-      ).unproject(state.camera);
-
-      dir
-        .copy(vec)
-        .sub(state.camera.position)
-        .normalize();
-
-      vec.add(
-        dir.multiplyScalar(
-          state.camera.position.length()
-        )
-      );
+      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
+      dir.copy(vec).sub(state.camera.position).normalize();
+      vec.add(dir.multiplyScalar(state.camera.position.length()));
 
       card.current.setNextKinematicTranslation({
         x: vec.x,
@@ -283,93 +263,77 @@ function Band({ isMobile }) {
     }
 
     if (
-      fixed.current &&
-      j1.current &&
-      j2.current &&
+      fixedLeft.current &&
+      l1.current &&
+      l2.current &&
+      fixedRight.current &&
+      r1.current &&
+      r2.current &&
       j3.current
     ) {
-      const p3 = j3.current.translation();
+      const pMeeting = j3.current.translation();
       
       // Prevent WebGL context loss from physics NaN explosion
-      if (isNaN(p3.x)) return;
+      if (isNaN(pMeeting.x)) return;
 
-      curve.points[0].copy(p3);
+      // Update Left Curve
+      curveLeft.points[0].copy(pMeeting);
+      curveLeft.points[1].copy(l2.current.translation());
+      curveLeft.points[2].copy(l1.current.translation());
+      curveLeft.points[3].copy(fixedLeft.current.translation());
+      bandLeft.current.geometry.setPoints(curveLeft.getPoints(isMobile ? 18 : 32));
 
-      curve.points[1].copy(
-        j2.current.translation()
-      );
-
-      curve.points[2].copy(
-        j1.current.translation()
-      );
-
-      curve.points[3].copy(
-        fixed.current.translation()
-      );
-
-      band.current.geometry.setPoints(
-        curve.getPoints(isMobile ? 18 : 32)
-      );
+      // Update Right Curve
+      curveRight.points[0].copy(pMeeting);
+      curveRight.points[1].copy(r2.current.translation());
+      curveRight.points[2].copy(r1.current.translation());
+      curveRight.points[3].copy(fixedRight.current.translation());
+      bandRight.current.geometry.setPoints(curveRight.getPoints(isMobile ? 18 : 32));
     }
   });
 
   return (
     <>
       <group position={[0, 2.2, 0]}>
-        <RigidBody
-          ref={fixed}
-          type="fixed"
-        />
-
-        <RigidBody
-          ref={j1}
-          position={[0.5, 0, 0]}
-          colliders={false}
-        >
+        {/* Left Rope Rigid Bodies */}
+        <RigidBody ref={fixedLeft} type="fixed" position={[-1.0, 0, 0]} />
+        <RigidBody ref={l1} position={[-0.66, -0.4, 0]} colliders={false}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody ref={l2} position={[-0.33, -0.8, 0]} colliders={false}>
           <BallCollider args={[0.1]} />
         </RigidBody>
 
-        <RigidBody
-          ref={j2}
-          position={[1, 0, 0]}
-          colliders={false}
-        >
+        {/* Right Rope Rigid Bodies */}
+        <RigidBody ref={fixedRight} type="fixed" position={[1.0, 0, 0]} />
+        <RigidBody ref={r1} position={[0.66, -0.4, 0]} colliders={false}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody ref={r2} position={[0.33, -0.8, 0]} colliders={false}>
           <BallCollider args={[0.1]} />
         </RigidBody>
 
-        <RigidBody
-          ref={j3}
-          position={[1.5, 0, 0]}
-          colliders={false}
-        >
+        {/* Joint Meeting Node */}
+        <RigidBody ref={j3} position={[0, -1.2, 0]} colliders={false}>
           <BallCollider args={[0.1]} />
         </RigidBody>
 
+        {/* Card Body */}
         <RigidBody
           ref={card}
-          position={[1.5, -1.45, 0]}
-          type={
-            dragged
-              ? 'kinematicPosition'
-              : 'dynamic'
-          }
+          position={[0, -2.65, 0]}
+          type={dragged ? 'kinematicPosition' : 'dynamic'}
           colliders={false}
           angularDamping={4}
           linearDamping={3}
         >
-          <CuboidCollider
-            args={[0.8, 1.1, 0.02]}
-          />
+          <CuboidCollider args={[0.8, 1.1, 0.02]} />
 
           <group
             scale={1.7}
             position={[0, -1.2, 0]}
-            onPointerOver={() =>
-              setHovered(true)
-            }
-            onPointerOut={() =>
-              setHovered(false)
-            }
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
             onPointerDown={(e) => {
               e.stopPropagation();
               setDragged(true);
@@ -379,103 +343,49 @@ function Band({ isMobile }) {
               setDragged(false);
             }}
           >
-            {/* CARD */}
-            <RoundedBox
-              args={[1.5, 2.2, 0.03]}
-              radius={0.08}
-              smoothness={6}
-            >
-              <meshPhysicalMaterial
-                color="#050505"
-                roughness={0.4}
-                metalness={0.7}
-                clearcoat={1}
-              />
-            </RoundedBox>
-
-            {/* INNER */}
-            <mesh position={[0, 0, 0.018]}>
-              <planeGeometry
-                args={[1.35, 2]}
-              />
-
-              <meshBasicMaterial
-                color="#0f172a"
+            {/* ID CARD IMAGE */}
+            <mesh position={[0, 0, 0]}>
+              <planeGeometry args={[1.5, 2.2]} />
+              <meshBasicMaterial 
+                map={cardMap}
+                transparent={true}
+                side={THREE.DoubleSide}
               />
             </mesh>
-
-            {/* TOP BAR */}
-            <mesh position={[0, 0.78, 0.02]}>
-              <planeGeometry
-                args={[1.35, 0.25]}
-              />
-
-              <meshBasicMaterial
-                color="#22c55e"
-              />
-            </mesh>
-
-            {/* PHOTO */}
-            <mesh position={[0, 0.05, 0.02]}>
-              <planeGeometry
-                args={[1.1, 1.1]}
-              />
-
-              <meshBasicMaterial
-                color="#1e293b"
-              />
-            </mesh>
-
-            {/* TAGS */}
-            {[-0.38, 0, 0.38].map(
-              (x, index) => (
-                <mesh
-                  key={index}
-                  position={[x, -0.75, 0.02]}
-                >
-                  <planeGeometry
-                    args={[0.35, 0.12]}
-                  />
-
-                  <meshBasicMaterial
-                    color="#22c55e"
-                  />
-                </mesh>
-              )
-            )}
 
             {/* CLIP */}
-            <mesh position={[0, 1.15, 0]}>
-              <torusGeometry
-                args={[0.08, 0.015, 16, 32]}
-              />
-
-              <meshStandardMaterial
-                color="#9ca3af"
-                metalness={1}
-                roughness={0.2}
-              />
+            <mesh position={[0, 1.2, 0]}>
+              <torusGeometry args={[0.08, 0.02, 16, 32]} />
+              <meshStandardMaterial color="#111111" metalness={1} roughness={0.2} />
             </mesh>
           </group>
         </RigidBody>
       </group>
 
-      {/* ROPE */}
-      <mesh ref={band}>
+      {/* LEFT ROPE */}
+      <mesh ref={bandLeft}>
         <meshLineGeometry />
-
         <meshLineMaterial
           useMap
           map={texture}
           transparent
           depthTest={false}
-          lineWidth={0.45}
-          resolution={
-            new THREE.Vector2(
-              window.innerWidth,
-              window.innerHeight
-            )
-          }
+          lineWidth={1.5}
+          resolution={new THREE.Vector2(window.innerWidth, window.innerHeight)}
+          repeat={[-3, 1]}
+        />
+      </mesh>
+
+      {/* RIGHT ROPE */}
+      <mesh ref={bandRight}>
+        <meshLineGeometry />
+        <meshLineMaterial
+          useMap
+          map={texture}
+          transparent
+          depthTest={false}
+          lineWidth={1.5}
+          resolution={new THREE.Vector2(window.innerWidth, window.innerHeight)}
           repeat={[-3, 1]}
         />
       </mesh>

@@ -3,9 +3,9 @@ import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
 import '../styles/MernUniverse.css';
 import '../styles/Galaxy.css';
 
-/* ─────────────────────────────────────────────────────────────
-   GLSL — exact shader from reference, unchanged
-   ───────────────────────────────────────────────────────────── */
+/* ---------------------------------------------------------------
+   GLSL -- exact shader from reference, unchanged
+   --------------------------------------------------------------- */
 const vertexShader = `
 attribute vec2 uv;
 attribute vec2 position;
@@ -174,47 +174,89 @@ void main() {
 }
 `;
 
-/* ─────────────────────────────────────────────────────────────
-   Section themes — hue + density change per section
-   hueShift values are sequential so transitions look smooth.
-   density > 1 = more/smaller stars (zoom-out feel)
-   ───────────────────────────────────────────────────────────── */
-/*
- * Color Palette: Green (highlight/primary) + Red & Pink (light secondaries)
- * ─────────────────────────────────────────────────────────────────────────
- *  Home       → Pure bright green  (#22c55e / #00ED64) — DOMINANT
- *  About      → Soft pink (light secondary)
- *  Skills     → Pink-magenta (secondary)
- *  Projects   → Warm red (secondary)
- *  Experience → Deep rose-red (secondary)
- *  Contact    → Blush pink → fades back to green hint
- * ─────────────────────────────────────────────────────────────────────────
- *  hueShift 140 = green peak  |  hueShift 350/5 = red  |  hueShift 330 = pink
- *  density  : higher = more/smaller stars (zoom-out feel)
- */
+/* ---------------------------------------------------------------
+   CINEMATIC SECTION THEMES
+   hueShift maps to the GLSL hue wheel:
+     140 = neon green  |  210 = deep blue   |  275 = purple
+     255 = indigo      |   25 = orange-red  |  152 = emerald
+   --------------------------------------------------------------- */
 const SECTION_THEMES = {
-  // Hero: pure vivid green — the signature color
-  home:       { hueShift: 140, density: 1.0,  speed: 1.0,  glowIntensity: 0.55, rotationSpeed: 0.05  },
-  // About: soft blush pink — light, gentle secondary
-  about:      { hueShift: 345, density: 1.15, speed: 1.05, glowIntensity: 0.32, rotationSpeed: 0.042 },
-  // Skills: pink-magenta — vibrant secondary
-  skills:     { hueShift: 330, density: 1.28, speed: 1.15, glowIntensity: 0.36, rotationSpeed: 0.055 },
-  // Projects: warm red — energetic secondary
-  projects:   { hueShift: 5,   density: 1.45, speed: 1.30, glowIntensity: 0.40, rotationSpeed: 0.068 },
-  // Experience: deep rose-red — rich secondary
-  experience: { hueShift: 358, density: 1.32, speed: 1.20, glowIntensity: 0.38, rotationSpeed: 0.058 },
-  // Contact: soft rose/pink — light secondary, calm close
-  contact:    { hueShift: 338, density: 1.18, speed: 1.05, glowIntensity: 0.33, rotationSpeed: 0.044 },
+  // HERO: Neon Green + Emerald + Cyan accent -- futuristic hacker-tech
+  home: {
+    hueShift: 140, density: 1.0,  speed: 1.0,  glowIntensity: 0.62,
+    rotationSpeed: 0.048, saturation: 4.8,
+    nebula: {
+      n1: 'rgba(34,  197,  94, 0.22)',
+      n2: 'rgba(  6, 182, 212, 0.14)',
+      n3: 'rgba( 16, 185, 129, 0.12)',
+      n4: 'rgba( 59, 130, 246, 0.10)',
+    },
+  },
+  // ABOUT: Deep Blue + Cyan -- calm, trustworthy, professional
+  about: {
+    hueShift: 210, density: 1.05, speed: 0.85, glowIntensity: 0.38,
+    rotationSpeed: 0.032, saturation: 3.8,
+    nebula: {
+      n1: 'rgba( 37,  99, 235, 0.20)',
+      n2: 'rgba(  6, 182, 212, 0.18)',
+      n3: 'rgba( 99, 102, 241, 0.10)',
+      n4: 'rgba( 14, 165, 233, 0.12)',
+    },
+  },
+  // SKILLS: Purple + Electric Cyan -- energetic, high-tech
+  skills: {
+    hueShift: 275, density: 1.30, speed: 1.20, glowIntensity: 0.50,
+    rotationSpeed: 0.065, saturation: 5.0,
+    nebula: {
+      n1: 'rgba(139,  92, 246, 0.22)',
+      n2: 'rgba(  6, 182, 212, 0.20)',
+      n3: 'rgba(167,  10, 255, 0.12)',
+      n4: 'rgba( 34, 211, 238, 0.14)',
+    },
+  },
+  // PROJECTS: Orange + Pink + Red -- cinematic, vibrant, creative
+  projects: {
+    hueShift: 25,  density: 1.50, speed: 1.40, glowIntensity: 0.55,
+    rotationSpeed: 0.075, saturation: 5.2,
+    nebula: {
+      n1: 'rgba(249, 115,  22, 0.22)',
+      n2: 'rgba(236,  72, 153, 0.18)',
+      n3: 'rgba(239,  68,  68, 0.16)',
+      n4: 'rgba(251, 191,  36, 0.12)',
+    },
+  },
+  // EXPERIENCE: Royal Purple + Indigo -- mature, professional, premium
+  experience: {
+    hueShift: 255, density: 1.20, speed: 1.10, glowIntensity: 0.42,
+    rotationSpeed: 0.048, saturation: 4.0,
+    nebula: {
+      n1: 'rgba( 99, 102, 241, 0.22)',
+      n2: 'rgba(109,  40, 217, 0.18)',
+      n3: 'rgba(139,  92, 246, 0.14)',
+      n4: 'rgba( 67,  56, 202, 0.12)',
+    },
+  },
+  // CONTACT: Green comeback -- futuristic ending, brand identity
+  contact: {
+    hueShift: 152, density: 1.08, speed: 1.02, glowIntensity: 0.58,
+    rotationSpeed: 0.044, saturation: 4.6,
+    nebula: {
+      n1: 'rgba( 16, 185, 129, 0.22)',
+      n2: 'rgba( 34, 197,  94, 0.18)',
+      n3: 'rgba(  6, 182, 212, 0.10)',
+      n4: 'rgba( 52, 211, 153, 0.14)',
+    },
+  },
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    Linear interpolation helper
-   ───────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 const lerp = (a, b, t) => a + (b - a) * t;
 
-/* ─────────────────────────────────────────────────────────────
-   MernUniverse — OGL Galaxy Background
-   ───────────────────────────────────────────────────────────── */
+/* ---------------------------------------------------------------
+   MernUniverse -- OGL Galaxy Background
+   --------------------------------------------------------------- */
 export default function MernUniverse() {
   const wrapperRef = useRef(null);
 
@@ -222,11 +264,11 @@ export default function MernUniverse() {
     const ctn = wrapperRef.current;
     if (!ctn) return;
 
-    /* ── OGL renderer ──────────────────────────────────────── */
+    /* OGL renderer */
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: false,
-      antialias: false,           // not needed for pixel-shader
+      antialias: false,
       powerPreference: 'high-performance',
     });
     const gl = renderer.gl;
@@ -235,7 +277,7 @@ export default function MernUniverse() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
-    /* ── Shader program ─────────────────────────────────────── */
+    /* Shader program */
     let program;
 
     const resize = () => {
@@ -267,11 +309,11 @@ export default function MernUniverse() {
         uRotation:            { value: new Float32Array([1.0, 0.0]) },
         uStarSpeed:           { value: 0 },
         uDensity:             { value: SECTION_THEMES.home.density },
-        uHueShift:            { value: 140 },   // start pure green immediately — no lerp delay
+        uHueShift:            { value: 140 },
         uSpeed:               { value: SECTION_THEMES.home.speed },
         uMouse:               { value: new Float32Array([0.5, 0.5]) },
         uGlowIntensity:       { value: SECTION_THEMES.home.glowIntensity },
-        uSaturation:          { value: 4.0 },   // vivid: hero green pops strong, red/pink are lighter
+        uSaturation:          { value: SECTION_THEMES.home.saturation },
         uMouseRepulsion:      { value: true },
         uTwinkleIntensity:    { value: 0.45 },
         uRotationSpeed:       { value: SECTION_THEMES.home.rotationSpeed },
@@ -285,7 +327,7 @@ export default function MernUniverse() {
     const mesh = new Mesh(gl, { geometry, program });
     ctn.appendChild(gl.canvas);
 
-    /* ── Mouse tracking ─────────────────────────────────────── */
+    /* Mouse tracking */
     const targetMouse = { x: 0.5, y: 0.5, active: 0 };
     const smoothMouse = { x: 0.5, y: 0.5, active: 0 };
 
@@ -297,11 +339,10 @@ export default function MernUniverse() {
     };
     const onMouseLeave = () => { targetMouse.active = 0.0; };
 
-    // Attach to window so mouse works even on content layers above canvas
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave);
 
-    /* ── Touch support (mobile parallax) ───────────────────── */
+    /* Touch support (mobile parallax) */
     const onTouch = (e) => {
       if (!e.touches.length) return;
       const rect = ctn.getBoundingClientRect();
@@ -312,32 +353,65 @@ export default function MernUniverse() {
     window.addEventListener('touchmove', onTouch, { passive: true });
     window.addEventListener('touchend', onMouseLeave, { passive: true });
 
-    /* ── Section theme tracking ─────────────────────────────── */
+    /* Section theme tracking -- scroll-position based for precision */
     const sectionIds = ['home', 'about', 'skills', 'projects', 'experience', 'contact'];
+
+    // Grab nebula DOM elements
+    const universeWrapper = ctn.closest('.mern-universe-wrapper') || ctn.parentElement;
+    const nebulaEls = [
+      universeWrapper?.querySelector('.nebula-1'),
+      universeWrapper?.querySelector('.nebula-2'),
+      universeWrapper?.querySelector('.nebula-3'),
+      universeWrapper?.querySelector('.nebula-4'),
+    ];
+
+    // Helper: apply nebula colors immediately (synchronous, before RAF)
+    const applyNebula = (palette) => {
+      if (nebulaEls[0]) nebulaEls[0].style.background = `radial-gradient(circle, ${palette.n1} 0%, transparent 70%)`;
+      if (nebulaEls[1]) nebulaEls[1].style.background = `radial-gradient(circle, ${palette.n2} 0%, transparent 70%)`;
+      if (nebulaEls[2]) nebulaEls[2].style.background = `radial-gradient(circle, ${palette.n3} 0%, transparent 70%)`;
+      if (nebulaEls[3]) nebulaEls[3].style.background = `radial-gradient(circle, ${palette.n4} 0%, transparent 70%)`;
+    };
 
     // current (smoothed) and target theme values
     const cur = { ...SECTION_THEMES.home };
     const tgt = { ...SECTION_THEMES.home };
+    let tgtNebula = SECTION_THEMES.home.nebula;
 
-    // IntersectionObserver to detect active section
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            if (SECTION_THEMES[id]) Object.assign(tgt, SECTION_THEMES[id]);
-          }
-        });
-      },
-      { threshold: 0.35 },
-    );
+    // Pre-apply home colours RIGHT NOW before any animation frame
+    applyNebula(SECTION_THEMES.home.nebula);
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) io.observe(el);
-    });
+    // Pick the section that owns the current scroll position
+    const getActiveSection = () => {
+      const viewMid = window.scrollY + window.innerHeight * 0.40;
+      let best = 'home';
+      let bestDist = Infinity;
+      sectionIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const elTop = rect.top + window.scrollY;
+        const elMid = elTop + el.offsetHeight * 0.5;
+        const dist = Math.abs(viewMid - elMid);
+        if (dist < bestDist) { bestDist = dist; best = id; }
+      });
+      return best;
+    };
 
-    /* ── Scroll velocity for zoom-burst effect ──────────────── */
+    const updateTheme = () => {
+      const id = getActiveSection();
+      if (SECTION_THEMES[id]) {
+        Object.assign(tgt, SECTION_THEMES[id]);
+        tgtNebula = SECTION_THEMES[id].nebula;
+      }
+    };
+
+    // Update on scroll
+    window.addEventListener('scroll', updateTheme, { passive: true });
+    // Also run once on load to catch any initial state
+    updateTheme();
+
+    /* Scroll velocity for zoom-burst effect */
     let lastScrollY    = window.scrollY;
     let scrollVelocity = 0;
 
@@ -347,9 +421,9 @@ export default function MernUniverse() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    /* ── Animation loop ─────────────────────────────────────── */
+    /* Animation loop */
     let raf;
-    const LT = 0.035; // lerp factor for theme transitions
+    const LT = 0.028; // lerp factor -- feels cinematic, not too snappy
 
     const animate = (t) => {
       raf = requestAnimationFrame(animate);
@@ -360,16 +434,17 @@ export default function MernUniverse() {
       smoothMouse.y      += (targetMouse.y - smoothMouse.y)           * 0.06;
       smoothMouse.active += (targetMouse.active - smoothMouse.active) * 0.06;
 
-      /* Smooth section theme */
+      /* Smooth section theme uniforms */
       cur.hueShift      = lerp(cur.hueShift,      tgt.hueShift,      LT);
       cur.density       = lerp(cur.density,        tgt.density,       LT);
       cur.speed         = lerp(cur.speed,          tgt.speed,         LT);
       cur.glowIntensity = lerp(cur.glowIntensity,  tgt.glowIntensity, LT);
       cur.rotationSpeed = lerp(cur.rotationSpeed,  tgt.rotationSpeed, LT);
+      cur.saturation    = lerp(cur.saturation,     tgt.saturation,    LT);
 
-      /* Scroll zoom-burst: fast scroll = more stars (higher density) */
+      /* Scroll zoom-burst */
       const scrollBoost = Math.min(scrollVelocity * 0.012, 0.8);
-      scrollVelocity   *= 0.88; // decay
+      scrollVelocity   *= 0.88;
 
       /* Write uniforms */
       program.uniforms.uTime.value          = time;
@@ -379,17 +454,21 @@ export default function MernUniverse() {
       program.uniforms.uSpeed.value         = cur.speed;
       program.uniforms.uGlowIntensity.value = cur.glowIntensity;
       program.uniforms.uRotationSpeed.value = cur.rotationSpeed;
+      program.uniforms.uSaturation.value    = cur.saturation;
 
-      program.uniforms.uMouse.value[0]           = smoothMouse.x;
-      program.uniforms.uMouse.value[1]           = smoothMouse.y;
-      program.uniforms.uMouseActiveFactor.value  = smoothMouse.active;
+      program.uniforms.uMouse.value[0]          = smoothMouse.x;
+      program.uniforms.uMouse.value[1]          = smoothMouse.y;
+      program.uniforms.uMouseActiveFactor.value = smoothMouse.active;
+
+      /* Drive nebula CSS blobs to match current section palette */
+      applyNebula(tgtNebula);
 
       renderer.render({ scene: mesh });
     };
 
     raf = requestAnimationFrame(animate);
 
-    /* ── Cleanup ────────────────────────────────────────────── */
+    /* Cleanup */
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
@@ -398,7 +477,7 @@ export default function MernUniverse() {
       window.removeEventListener('touchmove', onTouch);
       window.removeEventListener('touchend', onMouseLeave);
       window.removeEventListener('scroll', onScroll);
-      io.disconnect();
+      window.removeEventListener('scroll', updateTheme);
       if (gl.canvas.parentNode === ctn) ctn.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
@@ -406,7 +485,7 @@ export default function MernUniverse() {
 
   return (
     <div className="mern-universe-wrapper">
-      {/* Nebula aurora CSS blobs — always rendered behind the WebGL canvas */}
+      {/* Nebula aurora CSS blobs -- colors driven live by JS per section */}
       <div className="nebula nebula-1" />
       <div className="nebula nebula-2" />
       <div className="nebula nebula-3" />

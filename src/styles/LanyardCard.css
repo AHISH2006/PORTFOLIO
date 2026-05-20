@@ -5,23 +5,30 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 1.5rem;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(34,197,94,0.12),
-      rgba(2,6,23,0.25)
-    );
-
-  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .lanyard-wrapper:active {
   cursor: grabbing;
 }
 
+.lanyard-bg-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(4rem, 15vw, 12rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.04);
+  z-index: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
 .lanyard-wrapper canvas {
+  z-index: 1;
+  position: relative;
   width: 100% !important;
   height: 100% !important;
   display: block;
