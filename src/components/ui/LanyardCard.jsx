@@ -25,7 +25,7 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 
 import '../../styles/LanyardCard.css';
-import meImg from '../../assets/me.png';
+import meImg from '../../assets/ahish.png';
 
 extend({
   MeshLineGeometry,
