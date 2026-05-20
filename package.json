@@ -1,6 +1,9 @@
 {
   "name": "future-fs-01",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
