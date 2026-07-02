@@ -1,14 +1,3 @@
-/* Galaxy canvas — fills parent absolutely */
-.galaxy-container {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.galaxy-container canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
+/* Galaxy container — retained for backward compatibility.
+   The OGL WebGL canvas has been replaced with a pure CSS background.
+   This file is kept to avoid import errors in MernUniverse.css. */

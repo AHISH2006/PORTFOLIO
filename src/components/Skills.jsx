@@ -1,63 +1,307 @@
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { Code, Target, Database, Wrench } from 'lucide-react';
 import '../styles/Skills.css';
 
-export default function Skills() {
-  const skillCategories = [
-    {
-      title: "Core Programming",
-      skills: ["Python (AI Focus)", "JavaScript (ES6+)", "SQL & NoSQL"],
-    },
-    {
-      title: "Frontend Engineering",
-      skills: ["React.js Architecture", "React Native / Expo", "Tailwind & Headless UI"],
-    },
-    {
-      title: "Backend & Systems",
-      skills: ["Node.js / Express", "RESTful API Design", "System Integration"],
-    }
-  ];
+/* ─────────────────────────────────────────
+   DATA
+───────────────────────────────────────── */
+const SKILL_CATEGORIES = [
+  {
+    id: 'lang',
+    title: 'Programming Languages',
+    subtitle: 'The Building Blocks',
+    percentage: 95,
+    color: '#22c55e',
+    glow: 'rgba(34, 197, 94, 0.4)',
+    icon: Code,
+    desc: 'Core languages for building robust, high-performance systems and dynamic interfaces.',
+    skills: [
+      { name: 'Python', level: 95, icon: '🐍' },
+      { name: 'JavaScript', level: 92, icon: '⚡' },
+      { name: 'TypeScript', level: 88, icon: '🔷' },
+      { name: 'SQL', level: 85, icon: '🗄️' },
+    ],
+    radarPoints: [95, 92, 88, 85, 90, 80],
+    tags: ['OOP', 'Functional', 'Async', 'Type Safety'],
+  },
+  {
+    id: 'frontend',
+    title: 'Frontend Development',
+    subtitle: 'Visual Engineering',
+    percentage: 92,
+    color: '#3b82f6',
+    glow: 'rgba(59, 130, 246, 0.4)',
+    icon: Target,
+    desc: 'Creating immersive, responsive, and cinematic user interfaces with modern tech.',
+    skills: [
+      { name: 'React', level: 95, icon: '⚛️' },
+      { name: 'HTML5 / CSS3', level: 90, icon: '🎨' },
+      { name: 'React Native', level: 85, icon: '📱' },
+      { name: 'Framer Motion', level: 88, icon: '🎬' },
+    ],
+    radarPoints: [85, 95, 90, 85, 88, 92],
+    tags: ['Animations', 'Responsive', 'Accessibility', 'PWA'],
+  },
+  {
+    id: 'backend',
+    title: 'Backend & APIs',
+    subtitle: 'Server Architecture',
+    percentage: 85,
+    color: '#a855f7',
+    glow: 'rgba(168, 85, 247, 0.4)',
+    icon: Database,
+    desc: 'Architecting secure, scalable server-side applications and efficient RESTful APIs.',
+    skills: [
+      { name: 'Node.js', level: 88, icon: '🟢' },
+      { name: 'Express.js', level: 85, icon: '🚀' },
+      { name: 'REST API', level: 90, icon: '🔗' },
+      { name: 'MongoDB', level: 82, icon: '🍃' },
+    ],
+    radarPoints: [80, 85, 88, 90, 85, 82],
+    tags: ['REST', 'Auth', 'NoSQL', 'Middleware'],
+  },
+  {
+    id: 'tools',
+    title: 'Tools & Platforms',
+    subtitle: 'Dev Ecosystem',
+    percentage: 90,
+    color: '#f97316',
+    glow: 'rgba(249, 115, 22, 0.4)',
+    icon: Wrench,
+    desc: 'Leveraging modern development workflows, CI/CD pipelines, and design tooling.',
+    skills: [
+      { name: 'Git / GitHub', level: 92, icon: '🐙' },
+      { name: 'VS Code', level: 95, icon: '💻' },
+      { name: 'Figma', level: 85, icon: '🎯' },
+      { name: 'Vercel / Expo', level: 88, icon: '☁️' },
+    ],
+    radarPoints: [90, 88, 85, 92, 95, 85],
+    tags: ['CI/CD', 'Docker', 'Design', 'Cloud'],
+  },
+];
+
+/* ─────────────────────────────────────────
+   ANIMATED COUNTER
+───────────────────────────────────────── */
+function AnimCounter({ target, color }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasRun.current) {
+          hasRun.current = true;
+          let start = 0;
+          const duration = 1200;
+          const step = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = Math.min((timestamp - start) / duration, 1);
+            setVal(Math.floor(progress * target));
+            if (progress < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [target]);
 
   return (
-    <section id="skills" className="skills-container">
-       <motion.div
-        className="skills-header"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <span className="skills-overline">Technical Stack</span>
-        <h2 className="skills-title">
-          CAPABILITY <br /> <span className="text-green-500">INDEX</span>
-        </h2>
-      </motion.div>
+    <span ref={ref} style={{ color }}>
+      {val}%
+    </span>
+  );
+}
 
-      <div className="skills-grid">
-         {skillCategories.map((cat, i) => (
-            <motion.div
-              key={cat.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className="skills-category"
-            >
-               <h3 className="skills-category-title">
-                  {cat.title}
-               </h3>
-               <ul className="skills-list">
-                  {cat.skills.map(skill => (
-                     <li key={skill} className="skills-item group">
-                        <span className="skills-item-name">
-                           {skill}
-                        </span>
-                        <div className="skills-item-line" />
-                        <span className="skills-item-badge">Mastered</span>
-                     </li>
-                  ))}
-               </ul>
-            </motion.div>
-         ))}
+/* ─────────────────────────────────────────
+   3D TILT FLIP CARD COMPONENT
+───────────────────────────────────────── */
+function SkillFlipCard({ cat, index }) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const cardRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const IconComp = cat.icon;
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  // 3D Tilt on hover — lightweight, no Three.js
+  const handleMouseMove = useCallback((e) => {
+    if (isMobile) return;
+    const el = cardRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Subtle tilt (max ±8 degrees) — less aggressive than Projects since card also flips
+    const rotateY = ((x - centerX) / centerX) * 8;
+    const rotateX = ((centerY - y) / centerY) * 8;
+
+    el.style.setProperty('--tilt-x', `${rotateX}deg`);
+    el.style.setProperty('--tilt-y', `${rotateY}deg`);
+  }, [isMobile]);
+
+  const handleMouseLeave = useCallback(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    el.style.setProperty('--tilt-x', '0deg');
+    el.style.setProperty('--tilt-y', '0deg');
+    setIsFlipped(false);
+  }, []);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className="sk-card-container"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => setIsFlipped(!isFlipped)} /* For mobile tap to flip */
+    >
+      <div className={`sk-card-inner ${isFlipped ? 'flipped' : ''}`}>
+        
+        {/* FRONT FACE */}
+        <div className="sk-card-face sk-card-front" style={{ '--cat-color': cat.color, '--cat-glow': cat.glow }}>
+          <div className="sk-card-glow" style={{ background: cat.glow }} />
+          
+          <div className="sk-front-top">
+            <div className="sk-icon-wrap" style={{ borderColor: cat.color + '55', background: cat.color + '15' }}>
+              <IconComp size={32} color={cat.color} />
+            </div>
+            <div className="sk-pct-badge" style={{ borderColor: cat.color + '44', color: cat.color }}>
+              <AnimCounter target={cat.percentage} color={cat.color} />
+            </div>
+          </div>
+
+          <div className="sk-front-body">
+            <p className="sk-subtitle" style={{ color: cat.color }}>{cat.subtitle}</p>
+            <h3 className="sk-title">{cat.title}</h3>
+            <p className="sk-desc">{cat.desc}</p>
+          </div>
+
+          <div className="sk-front-bottom">
+            <div className="sk-flip-hint" style={{ color: cat.color }}>
+              {isMobile ? 'Tap to expand' : 'Hover to expand'}
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          {/* Corner accents */}
+          <div className="sk-corner sk-corner-tl" style={{ borderColor: cat.color + '60' }} />
+          <div className="sk-corner sk-corner-br" style={{ borderColor: cat.color + '60' }} />
+        </div>
+
+        {/* BACK FACE */}
+        <div className="sk-card-face sk-card-back" style={{ '--cat-color': cat.color, '--cat-glow': cat.glow }}>
+          <div className="sk-card-glow" style={{ background: cat.glow }} />
+
+          <div className="sk-back-header">
+            <h4 className="sk-back-title" style={{ color: cat.color }}>{cat.title}</h4>
+          </div>
+
+          <div className="sk-bars">
+            {cat.skills.map((s, i) => (
+              <div key={s.name} className="sk-bar-row">
+                <div className="sk-bar-header">
+                  <span className="sk-bar-emoji">{s.icon}</span>
+                  <span className="sk-bar-name">{s.name}</span>
+                  <span className="sk-bar-pct" style={{ color: cat.color }}>{s.level}%</span>
+                </div>
+                <div className="sk-bar-track">
+                  <div
+                    className="sk-bar-fill"
+                    style={{
+                      width: isFlipped ? `${s.level}%` : '0%',
+                      background: `linear-gradient(90deg, ${cat.color}cc, ${cat.color})`,
+                      boxShadow: `0 0 10px ${cat.glow}`,
+                      transition: isFlipped ? `width 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.1 + 0.2}s` : 'none',
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="sk-tags">
+            {cat.tags.map(t => (
+              <span key={t} className="sk-tag" style={{ borderColor: cat.color + '44', color: cat.color }}>
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* Corner accents */}
+          <div className="sk-corner sk-corner-tl" style={{ borderColor: cat.color + '60' }} />
+          <div className="sk-corner sk-corner-br" style={{ borderColor: cat.color + '60' }} />
+        </div>
+
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────── */
+export default function Skills() {
+  return (
+    <section id="skills" className="sk-section cinematic-section parallax-depth-layer">
+      <div className="sk-container">
+        
+        {/* Header */}
+        <div className="sk-section-header">
+          <motion.span
+            className="sk-overline"
+            initial={{ opacity: 0, y: -12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            Technical Mastery
+          </motion.span>
+          <motion.h2
+            className="sk-section-title"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            CAPABILITY <span className="sk-accent">INDEX</span>
+          </motion.h2>
+          <motion.p
+            className="sk-section-sub"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Hover or tap to reveal skill metrics
+          </motion.p>
+        </div>
+
+        {/* 3D Flip Card Grid */}
+        <div className="sk-grid">
+          {SKILL_CATEGORIES.map((cat, i) => (
+            <SkillFlipCard key={cat.id} cat={cat} index={i} />
+          ))}
+        </div>
+
       </div>
     </section>
   );

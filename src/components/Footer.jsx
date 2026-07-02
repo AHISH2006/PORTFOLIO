@@ -6,38 +6,40 @@ export default function Footer() {
 
   return (
     <footer className="footer-container">
+      {/* Cyber Grid Backdrop */}
+      <div className="footer-grid-bg" />
+
       <div className="footer-inner">
         <div className="footer-top">
-          <div className="footer-brand">
-            <h3 className="footer-logo">AHISH S M</h3>
+          <div className="footer-brand reveal-child">
+            <h3 className="footer-logo">AHISH <span>S M</span></h3>
             <p className="footer-tagline">Architecting the MERN Omniverse.</p>
           </div>
           
           <div className="footer-links">
-             <div className="footer-link-group">
+             <div className="footer-link-group reveal-child">
                 <h4 className="footer-link-title">Navigation</h4>
                 <ul className="footer-link-list">
-                   <li><a href="#home">Home</a></li>
+                   <li><a href="#hero">Home</a></li>
                    <li><a href="#about">About</a></li>
                    <li><a href="#projects">Projects</a></li>
                 </ul>
              </div>
-             <div className="footer-link-group">
+             <div className="footer-link-group reveal-child">
                 <h4 className="footer-link-title">Connect</h4>
                 <ul className="footer-link-list">
-                   <li><a href="#">LinkedIn</a></li>
-                   <li><a href="#">GitHub</a></li>
-                   <li><a href="#">Twitter</a></li>
+                   <li><a href="https://linkedin.com/in/ahish-sm" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                   <li><a href="https://github.com/AHISH2006" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                   <li><a href="https://x.com" target="_blank" rel="noopener noreferrer">Twitter</a></li>
                 </ul>
              </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
+        <div className="footer-bottom reveal-child">
           <p className="footer-copyright">
             © {currentYear} AHISH S M. ALL RIGHTS RESERVED.
           </p>
-
         </div>
       </div>
     </footer>

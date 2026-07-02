@@ -18,8 +18,11 @@ function App() {
 
   return (
     <>
-      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-      <Router />
+      {loading ? (
+        <LoadingScreen onComplete={() => setLoading(false)} />
+      ) : (
+        <Router />
+      )}
     </>
   );
 }

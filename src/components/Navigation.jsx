@@ -8,21 +8,42 @@ export default function Navigation() {
   const [menuOpen, setMenuOpen]           = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      const sections = ['home', 'about', 'skills', 'projects', 'experience', 'contact'];
-      for (const id of sections) {
-        const el = document.getElementById(id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
-            setActiveSection(id);
-            break;
-          }
-        }
-      }
-    };
+    // Track navbar scroll state — simple scrollY check, no DOM queries
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const sectionIds = ['home', 'about', 'skills', 'projects', 'experience', 'contact'];
+    
+    const handleScroll = () => {
+      const viewMid = window.scrollY + window.innerHeight * 0.45; // screen focal point
+      let best = 'home';
+      let bestDist = Infinity;
+      
+      sectionIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        
+        // Use static vertical position to avoid 3D transform coordinates distortion
+        const rect = el.getBoundingClientRect();
+        const elTop = rect.top + window.scrollY;
+        const elMid = elTop + el.offsetHeight * 0.5;
+        
+        const dist = Math.abs(viewMid - elMid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = id;
+        }
+      });
+      setActiveSection(best);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Trigger on mount
+    handleScroll();
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -33,10 +54,20 @@ export default function Navigation() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Lock body scroll when drawer open
+  // Lock body scroll when drawer open (sync with Lenis if active)
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (window.lenis) {
+      if (menuOpen) {
+        window.lenis.stop();
+      } else {
+        window.lenis.start();
+      }
+    }
+    return () => {
+      document.body.style.overflow = '';
+      if (window.lenis) window.lenis.start();
+    };
   }, [menuOpen]);
 
   const navItems = [
@@ -51,7 +82,12 @@ export default function Navigation() {
     setMenuOpen(false);
     setTimeout(() => {
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (!el) return;
+      if (window.lenis) {
+        window.lenis.scrollTo(el, { duration: 1.2 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }, 50);
   };
 

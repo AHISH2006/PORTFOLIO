@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import '../styles/Hero.css';
 
 export default function Hero() {
@@ -13,15 +13,13 @@ export default function Hero() {
   });
 
   // Content rises slightly and fades as hero exits — stays FULLY visible until scroll starts
-  const rawY     = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
-  const rawScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-  const rawOp    = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const rawBlur  = useTransform(scrollYProgress, [0, 1], [0, 6]);
-
-  const y       = useSpring(rawY,     { stiffness: 55, damping: 18 });
-  const scale   = useSpring(rawScale, { stiffness: 55, damping: 18 });
-  const opacity = rawOp;
-  const blurPx  = useTransform(rawBlur, (v) => `blur(${v}px)`);
+  const y       = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
+  const scale   = useTransform(scrollYProgress, [0, 1], [1, 0.88]);
+  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const rotateX = useTransform(scrollYProgress, [0, 1], [0, 8]);
+  const blurPx  = useTransform(scrollYProgress, [0, 1], [0, 6],
+    { clamp: true });
+  const filterBlur = useTransform(blurPx, (v) => `blur(${v}px)`);
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -52,7 +50,7 @@ export default function Hero() {
 
       {/* Scroll-parallax content wrapper */}
       <motion.div
-        style={{ y, scale, opacity, filter: blurPx }}
+        style={{ y, scale, opacity, rotateX, filter: filterBlur, perspective: 1200 }}
         className="hero-parallax-wrapper"
       >
         <motion.div

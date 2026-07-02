@@ -1,148 +1,532 @@
-/* ═══════════════════════════════════════════════
-   SKILLS — Responsive
-   ═══════════════════════════════════════════════ */
+/* ==========================================================================
+   SKILLS — 3D TILT FLIP CARD GRID (Responsive, Performance-Optimized)
+   ========================================================================== */
 
-.skills-container {
-  padding: 4rem 2rem;
+.sk-section {
+  position: relative;
   width: 100%;
-  max-width: 88rem;
+  padding: 8rem 0 6rem;
+  z-index: 2;
+}
+
+.sk-container {
+  width: 100%;
+  max-width: 90rem;
   margin: 0 auto;
+  padding: 0 2rem;
 }
 
-.skills-header {
-  margin-bottom: 4rem;
-  text-align: left;
+/* ── Header ── */
+.sk-section-header {
+  text-align: center;
+  margin-bottom: 5rem;
 }
 
-.skills-overline {
+.sk-overline {
+  display: block;
   color: #22c55e;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.4em;
-  font-size: 0.625rem;
-  display: block;
-  margin-bottom: 1rem;
+  font-size: 0.65rem;
+  margin-bottom: 0.8rem;
 }
 
-.skills-title {
-  font-size: clamp(2.5rem, 9vw, 7rem);
-  font-weight: 900;
-  letter-spacing: -0.05em;
+.sk-section-title {
   color: #fff;
-  line-height: 1;
-}
-
-.skills-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-}
-
-@media (min-width: 640px) {
-  .skills-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .skills-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.skills-category {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.skills-category-title {
-  color: #fff;
+  font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 900;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.skills-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.skills-item {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
-.skills-item-name {
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-  font-weight: 900;
-  color: #64748b;
-  transition: color 0.3s ease;
   letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0 0 0.8rem 0;
 }
 
-.skills-item:hover .skills-item-name {
-  color: #fff;
-}
-
-.skills-item-line {
-  flex: 1;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-  margin: 0 1rem 0.4rem;
-  transition: border-color 0.3s ease;
-}
-
-.skills-item:hover .skills-item-line {
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.skills-item-badge {
-  font-size: 0.6rem;
-  font-weight: 900;
+.sk-accent {
   color: #22c55e;
+}
+
+.sk-section-sub {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* ── Grid ── */
+.sk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  /* Note: perspective + transform-style removed from the grid container.
+     When the parent section has a GSAP transform applied, a child
+     perspective container causes cards to disappear (GPU layer conflict).
+     3D tilt is now perspective-per-card, not per-grid. */
+}
+
+/* ── 3D Tilt Flip Card Container ── */
+.sk-card-container {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  perspective: 1500px;
+  cursor: pointer;
+  /* 3D tilt driven by CSS custom properties (set by JS) */
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.4s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+  will-change: transform;
+}
+
+.sk-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  transform-style: preserve-3d;
+}
+
+/* The .flipped class is applied via React state on hover/tap */
+.sk-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+/* ── Card Faces (Front & Back) ── */
+.sk-card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+}
+
+.sk-card-container:hover .sk-card-face {
+  border-color: var(--cat-color);
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.45),
+    0 0 40px color-mix(in srgb, var(--cat-color) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.sk-card-back {
+  transform: rotateY(180deg);
+  background: rgba(10, 15, 30, 0.8);
+}
+
+/* Glow behind content */
+.sk-card-glow {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.6s ease;
+}
+
+.sk-card-container:hover .sk-card-glow {
+  opacity: 0.15;
+}
+
+/* ── FRONT FACE CONTENT ── */
+.sk-front-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1.5rem;
+}
+
+.sk-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sk-pct-badge {
+  padding: 0.4rem 1rem;
+  border: 1px solid;
+  border-radius: 99px;
+  font-size: 1.3rem;
+  font-weight: 900;
   white-space: nowrap;
 }
 
-.skills-item:hover .skills-item-badge {
-  opacity: 1;
+.sk-front-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
 }
 
-/* ── Responsive ───────────────────────────────── */
-@media (max-width: 768px) {
-  .skills-container {
-    padding: 3rem 1.2rem;
+.sk-subtitle {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 800;
+  margin: 0 0 0.4rem 0;
+}
+
+.sk-title {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 0.8rem 0;
+  letter-spacing: -0.02em;
+}
+
+.sk-desc {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sk-front-bottom {
+  position: relative;
+  z-index: 2;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.2rem;
+}
+
+.sk-flip-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, gap 0.3s ease;
+}
+
+.sk-card-container:hover .sk-flip-hint {
+  opacity: 1;
+  gap: 0.75rem;
+}
+
+
+/* ── BACK FACE CONTENT ── */
+.sk-back-header {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.8rem;
+}
+
+.sk-back-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+/* Skill bars */
+.sk-bars {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.sk-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sk-bar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sk-bar-emoji {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.sk-bar-name {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sk-bar-pct {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.sk-bar-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.sk-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  /* Width and transition are set inline by React when flipped */
+}
+
+/* Tags */
+.sk-tags {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+}
+
+.sk-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ── Corner Accents ── */
+.sk-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--cat-color);
+  border-style: solid;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sk-corner-tl {
+  top: 12px;
+  left: 12px;
+  border-width: 2px 0 0 2px;
+  border-radius: 6px 0 0 0;
+  transform: translate(10px, 10px);
+}
+
+.sk-corner-br {
+  bottom: 12px;
+  right: 12px;
+  border-width: 0 2px 2px 0;
+  border-radius: 0 0 6px 0;
+  transform: translate(-10px, -10px);
+}
+
+.sk-card-container:hover .sk-corner {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Float animation removed — conflicts with GSAP ScrollTrigger transforms
+   on the parent .cinematic-section wrapper. Cards use hover effects instead. */
+/* .sk-grid { animation: skFloat ... } */
+
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+@media (max-width: 1200px) {
+  .sk-grid {
+    gap: 2rem;
   }
 
-  .skills-header {
+  .sk-card-face {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sk-container {
+    padding: 0 1.5rem;
+  }
+  
+  .sk-grid {
+    gap: 1.5rem;
+  }
+
+  .sk-card-face {
+    padding: 1.8rem;
+  }
+  
+  .sk-title {
+    font-size: 1.5rem;
+  }
+
+  .sk-card-container {
+    min-height: 340px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sk-section {
+    padding: 6rem 0 4rem;
+  }
+
+  .sk-section-header {
     margin-bottom: 3rem;
+  }
+
+  .sk-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 440px;
+    margin: 0 auto;
+    animation: none; /* Disable floating on mobile */
+    perspective: none;
+  }
+
+  .sk-card-container {
+    min-height: 320px;
+    /* Disable 3D tilt on mobile */
+    transform: none !important;
+    transition: none;
+  }
+
+  .sk-card-face {
+    padding: 1.8rem;
+  }
+
+  .sk-icon-wrap {
+    width: 50px;
+    height: 50px;
+  }
+
+  .sk-pct-badge {
+    font-size: 1.1rem;
+    padding: 0.35rem 0.85rem;
+  }
+
+  .sk-title {
+    font-size: 1.4rem;
+  }
+
+  .sk-desc {
+    font-size: 0.85rem;
+  }
+
+  .sk-front-top {
+    margin-bottom: 1.2rem;
+  }
+
+  .sk-front-bottom {
+    margin-top: 1rem;
+    padding-top: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .skills-container {
-    padding: 2.5rem 1rem;
+  .sk-section {
+    padding: 5rem 0 3rem;
   }
 
-  .skills-header {
-    margin-bottom: 2.5rem;
+  .sk-container {
+    padding: 0 1rem;
   }
 
-  .skills-grid {
-    gap: 2.5rem;
+  .sk-section-title {
+    font-size: 2rem;
   }
 
-  .skills-item-name {
-    font-size: 1.1rem;
+  .sk-grid {
+    max-width: 100%;
+    gap: 1.25rem;
+  }
+
+  .sk-card-container {
+    min-height: 310px;
+  }
+
+  .sk-card-face {
+    padding: 1.5rem;
+  }
+
+  .sk-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sk-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .sk-bar-name {
+    font-size: 0.8rem;
+  }
+
+  .sk-bar-pct {
+    font-size: 0.75rem;
+  }
+
+  .sk-bar-track {
+    height: 6px;
+  }
+
+  .sk-flip-hint {
+    font-size: 0.6rem;
+  }
+
+  .sk-tags {
+    margin-top: 1rem;
+  }
+
+  .sk-tag {
+    font-size: 0.55rem;
+    padding: 0.25rem 0.55rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .sk-card-container {
+    min-height: 300px;
+  }
+
+  .sk-card-face {
+    padding: 1.25rem;
+  }
+
+  .sk-icon-wrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .sk-title {
+    font-size: 1.2rem;
+  }
+
+  .sk-bars {
+    gap: 0.8rem;
   }
 }

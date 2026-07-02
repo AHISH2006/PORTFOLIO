@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, lazy, Suspense } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 import Hero from "../components/Hero";
 import About from "../components/About";
 import Skills from "../components/Skills";
-import Projects from "../components/Projects";
+const Projects = lazy(() => import("../components/Projects"));
 import Experience from "../components/Experience";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
@@ -20,103 +20,355 @@ export default function Portfolio() {
   const containerRef = useRef(null);
 
   useGSAP(() => {
-    const sections = gsap.utils.toArray(".cinematic-section");
+    const mm = gsap.matchMedia();
 
-    sections.forEach((section) => {
-      gsap.fromTo(
-        section,
-        {
+    /* ═══════════════════════════════════════════════════════════
+       DESKTOP (≥ 1025px)
+       ─────────────────────────────────────────────────────────
+       RULE: Content must NEVER be hidden while still in viewport.
+       • Entry: section zooms in from below as it enters (scrub)
+       • Exit:  section zooms out ONLY after it has almost left
+         the viewport — start: "bottom 5%"  so it's nearly gone.
+       • Zoom-in on scroll-up: because exit is scrubbed, reversing
+         scroll reverses exit → content zooms back in identically.
+       ═══════════════════════════════════════════════════════════ */
+    mm.add("(min-width: 1025px)", () => {
+      const sections = gsap.utils
+        .toArray(".cinematic-section")
+        .filter((el) => !el.hasAttribute("data-no-cinematic"));
+
+      sections.forEach((section) => {
+        const children = section.querySelectorAll(".reveal-child");
+
+        /* ── Initial state — hidden below, slightly pushed back ── */
+        gsap.set(section, {
           opacity: 0,
-          y: 60,
-          filter: "blur(10px)",
-        },
-        {
+          y: 80,
+          scale: 0.94,
+          transformPerspective: 1600,
+          transformOrigin: "50% 100%",
+        });
+
+        if (children.length > 0) {
+          gsap.set(children, { opacity: 0, y: 40, scale: 0.96 });
+        }
+
+        /* ── ENTRY: as section scrolls into view ── */
+        gsap.to(section, {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1,
-          ease: "power3.out",
-
+          scale: 1,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: section,
-            start: "top 85%",
-            end: "top 40%",
-            toggleActions: "play none none reverse",
-
+            /* Start animating when top of section hits bottom of viewport */
+            start: "top 98%",
+            /* Complete by the time top of section is 30% from top of viewport */
+            end: "top 30%",
+            scrub: 1.2,
             invalidateOnRefresh: true,
           },
+        });
+
+        /* ── Children stagger ── */
+        if (children.length > 0) {
+          gsap.to(children, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            stagger: { amount: 0.4, ease: "power1.inOut" },
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 90%",
+              end: "top 20%",
+              scrub: 1.5,
+              invalidateOnRefresh: true,
+            },
+          });
         }
-      );
+
+        /* ── EXIT: ONLY starts when section bottom is 5% from top of viewport
+           (section is almost completely scrolled away).
+           This guarantees content is ALWAYS fully visible while in view. ── */
+        gsap.to(section, {
+          opacity: 0,
+          y: -60,
+          scale: 0.94,
+          immediateRender: false,
+          ease: "power2.in",
+          scrollTrigger: {
+            trigger: section,
+            /* Only start exiting when section bottom is about to leave */
+            start: "bottom 8%",
+            end: "bottom -5%",
+            scrub: 1.2,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+
+      /* ── Hero exit — pushes back as you scroll away ── */
+      const heroP = document.querySelector(".hero-parallax-wrapper");
+      if (heroP) {
+        gsap.to(heroP, {
+          y: -80,
+          scale: 0.88,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+
+      /* ── Background layer parallax — subtle depth ── */
+      const bgLayer = document.querySelector(".background-layer");
+      if (bgLayer) {
+        gsap.to(bgLayer, {
+          y: -200,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".portfolio-root",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
     });
 
-    ScrollTrigger.refresh();
+    /* ═══════════════════════════════════════════════════════════
+       TABLET (769px – 1024px)
+       Lighter 3D — no rotateX, just fade + slide.
+       ═══════════════════════════════════════════════════════════ */
+    mm.add("(min-width: 769px) and (max-width: 1024px)", () => {
+      const sections = gsap.utils
+        .toArray(".cinematic-section")
+        .filter((el) => !el.hasAttribute("data-no-cinematic"));
+
+      sections.forEach((section) => {
+        const children = section.querySelectorAll(".reveal-child");
+
+        gsap.set(section, { opacity: 0, y: 60, scale: 0.95 });
+        if (children.length > 0) {
+          gsap.set(children, { opacity: 0, y: 35 });
+        }
+
+        /* Entry */
+        gsap.to(section, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 98%",
+            end: "top 30%",
+            scrub: 1.0,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        if (children.length > 0) {
+          gsap.to(children, {
+            opacity: 1,
+            y: 0,
+            stagger: 0.08,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 88%",
+              end: "top 20%",
+              scrub: 1.0,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+
+        /* Exit — only when section is almost off the top */
+        gsap.to(section, {
+          opacity: 0,
+          y: -50,
+          scale: 0.95,
+          immediateRender: false,
+          ease: "power2.in",
+          scrollTrigger: {
+            trigger: section,
+            start: "bottom 8%",
+            end: "bottom -5%",
+            scrub: 1.0,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE (≤ 768px)
+       Simple fade-in only. No exit — mobile users scroll fast
+       and hiding exiting content is disorienting.
+       ═══════════════════════════════════════════════════════════ */
+    mm.add("(max-width: 768px)", () => {
+      const sections = gsap.utils
+        .toArray(".cinematic-section")
+        .filter((el) => !el.hasAttribute("data-no-cinematic"));
+
+      sections.forEach((section) => {
+        const children = section.querySelectorAll(".reveal-child");
+
+        /* Start fully invisible, slide up into view */
+        gsap.set(section, { opacity: 0, y: 30 });
+        if (children.length > 0) {
+          gsap.set(children, { opacity: 0, y: 20 });
+        }
+
+        /* Fade + slide in — one-way, no exit (content stays visible) */
+        gsap.to(section, {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 95%",
+            end: "top 50%",
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        if (children.length > 0) {
+          gsap.to(children, {
+            opacity: 1,
+            y: 0,
+            stagger: 0.06,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 92%",
+              end: "top 40%",
+              scrub: 0.8,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+      });
+    });
+
+    /* ── ScrollTrigger refresh cascade ── */
+    const scheduleRefresh = () => ScrollTrigger.refresh();
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(scheduleRefresh);
+    }
+    const t1 = setTimeout(scheduleRefresh, 500);
+    const t2 = setTimeout(scheduleRefresh, 1500);
+    const t3 = setTimeout(scheduleRefresh, 3000);
+    const t4 = setTimeout(scheduleRefresh, 6000);
+
+    /* ── Border glow colour shift on scroll ── */
+    gsap.to(".scrolling-border-frame", {
+      "--glow-color": "#06b6d4",
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".portfolio-root",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+      },
+      keyframes: {
+        "0%":   { "--glow-color": "#22c55e" },
+        "25%":  { "--glow-color": "#3b82f6" },
+        "50%":  { "--glow-color": "#a855f7" },
+        "75%":  { "--glow-color": "#f59e0b" },
+        "100%": { "--glow-color": "#06b6d4" },
+      }
+    });
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      mm.revert();
+    };
   }, { scope: containerRef });
 
   return (
     <CinematicWrapper>
-      <div
-        ref={containerRef}
-        className="portfolio-root"
-      >
+      <div ref={containerRef} className="portfolio-root">
+        {/* Global animated border glow frame */}
+        <div className="scrolling-border-frame" />
+
         <Navigation />
 
-        {/* Background 3D */}
+        {/* 3D background canvas */}
         <div className="background-layer">
           <MernUniverse />
         </div>
 
-        {/* Noise Overlay */}
+        {/* Film grain overlay */}
         <div className="noise-overlay" />
 
         <main className="main-content">
-          {/* HERO */}
-          <section
-            id="hero"
-            className="hero-section"
-          >
+
+          {/* Hero — full viewport, no cinematic wrapper needed */}
+          <section id="hero" className="hero-section">
             <Hero />
           </section>
 
-          {/* ABOUT */}
-          <section
-            id="about"
-            className="cinematic-section"
-          >
+          {/* About */}
+          <section id="about" className="cinematic-section">
             <About />
           </section>
 
-          {/* SKILLS */}
-          <section
-            id="skills"
-            className="cinematic-section"
-          >
+          {/* Skills */}
+          <section id="skills" className="cinematic-section">
             <Skills />
           </section>
 
-          {/* PROJECTS */}
+          {/* Projects — data-no-cinematic: manages its own GSAP pin internally.
+              Keeps cinematic-section class so mobile fade-in still works. */}
           <section
             id="projects"
             className="cinematic-section"
+            data-no-cinematic
           >
-            <Projects />
+            <Suspense
+              fallback={
+                <div style={{
+                  minHeight: "100vh",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#22c55e",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.2em",
+                  fontWeight: 700,
+                }}>
+                  LOADING CLUSTERS...
+                </div>
+              }
+            >
+              <Projects />
+            </Suspense>
           </section>
 
-          {/* EXPERIENCE */}
-          <section
-            id="experience"
-            className="cinematic-section"
-          >
+          {/* Experience */}
+          <section id="experience" className="cinematic-section">
             <Experience />
           </section>
 
-          {/* CONTACT */}
-          <section
-            id="contact"
-            className="cinematic-section"
-          >
+          {/* Contact + Footer */}
+          <section id="contact" className="cinematic-section">
             <Contact />
             <Footer />
           </section>
+
         </main>
       </div>
     </CinematicWrapper>
