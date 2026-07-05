@@ -65,7 +65,7 @@ export default function Portfolio() {
             start: "top 98%",
             /* Complete by the time top of section is 30% from top of viewport */
             end: "top 30%",
-            scrub: 1.2,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         });
@@ -82,30 +82,31 @@ export default function Portfolio() {
               trigger: section,
               start: "top 90%",
               end: "top 20%",
-              scrub: 1.5,
+              scrub: true,
               invalidateOnRefresh: true,
             },
           });
         }
 
         /* ── EXIT: ONLY starts when section bottom is 5% from top of viewport
-           (section is almost completely scrolled away).
-           This guarantees content is ALWAYS fully visible while in view. ── */
-        gsap.to(section, {
-          opacity: 0,
-          y: -60,
-          scale: 0.94,
-          immediateRender: false,
-          ease: "power2.in",
-          scrollTrigger: {
-            trigger: section,
-            /* Only start exiting when section bottom is about to leave */
-            start: "bottom 8%",
-            end: "bottom -5%",
-            scrub: 1.2,
-            invalidateOnRefresh: true,
-          },
-        });
+           Skip exit on last section — nothing to scroll to after it. ── */
+        const isLast = section === sections[sections.length - 1];
+        if (!isLast) {
+          gsap.to(section, {
+            opacity: 0,
+            y: -60,
+            scale: 0.94,
+            immediateRender: false,
+            ease: "power2.in",
+            scrollTrigger: {
+              trigger: section,
+              start: "bottom 8%",
+              end: "bottom -5%",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
       });
 
       /* ── Hero exit — pushes back as you scroll away ── */
@@ -120,7 +121,7 @@ export default function Portfolio() {
             trigger: "#hero",
             start: "top top",
             end: "bottom top",
-            scrub: 0.8,
+          scrub: true,
             invalidateOnRefresh: true,
           },
         });
@@ -133,7 +134,7 @@ export default function Portfolio() {
           y: -200,
           ease: "none",
           scrollTrigger: {
-            trigger: ".portfolio-root",
+            trigger: containerRef.current,
             start: "top top",
             end: "bottom bottom",
             scrub: true,
@@ -170,7 +171,7 @@ export default function Portfolio() {
             trigger: section,
             start: "top 98%",
             end: "top 30%",
-            scrub: 1.0,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         });
@@ -185,34 +186,37 @@ export default function Portfolio() {
               trigger: section,
               start: "top 88%",
               end: "top 20%",
-              scrub: 1.0,
+              scrub: true,
               invalidateOnRefresh: true,
             },
           });
         }
 
         /* Exit — only when section is almost off the top */
-        gsap.to(section, {
-          opacity: 0,
-          y: -50,
-          scale: 0.95,
-          immediateRender: false,
-          ease: "power2.in",
-          scrollTrigger: {
-            trigger: section,
-            start: "bottom 8%",
-            end: "bottom -5%",
-            scrub: 1.0,
-            invalidateOnRefresh: true,
-          },
-        });
+        const isLast = section === sections[sections.length - 1];
+        if (!isLast) {
+          gsap.to(section, {
+            opacity: 0,
+            y: -50,
+            scale: 0.95,
+            immediateRender: false,
+            ease: "power2.in",
+            scrollTrigger: {
+              trigger: section,
+              start: "bottom 8%",
+              end: "bottom -5%",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
       });
     });
 
     /* ═══════════════════════════════════════════════════════════
        MOBILE (≤ 768px)
-       Simple fade-in only. No exit — mobile users scroll fast
-       and hiding exiting content is disorienting.
+       Same cinematic zoom-in entry + zoom-out exit as desktop.
+       Scrub = bidirectional — scroll up reverses the animation.
        ═══════════════════════════════════════════════════════════ */
     mm.add("(max-width: 768px)", () => {
       const sections = gsap.utils
@@ -222,22 +226,30 @@ export default function Portfolio() {
       sections.forEach((section) => {
         const children = section.querySelectorAll(".reveal-child");
 
-        /* Start fully invisible, slide up into view */
-        gsap.set(section, { opacity: 0, y: 30 });
+        /* Start invisible, slightly below + scaled down */
+        gsap.set(section, {
+          opacity: 0,
+          y: 50,
+          scale: 0.93,
+          transformPerspective: 1200,
+          transformOrigin: "50% 100%",
+        });
+
         if (children.length > 0) {
-          gsap.set(children, { opacity: 0, y: 20 });
+          gsap.set(children, { opacity: 0, y: 30, scale: 0.96 });
         }
 
-        /* Fade + slide in — one-way, no exit (content stays visible) */
+        /* ── ENTRY: zoom in + rise as section scrolls into view ── */
         gsap.to(section, {
           opacity: 1,
           y: 0,
+          scale: 1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: section,
-            start: "top 95%",
-            end: "top 50%",
-            scrub: 0.8,
+            start: "top 98%",
+            end: "top 35%",
+            scrub: true,
             invalidateOnRefresh: true,
           },
         });
@@ -246,17 +258,35 @@ export default function Portfolio() {
           gsap.to(children, {
             opacity: 1,
             y: 0,
-            stagger: 0.06,
+            scale: 1,
+            stagger: { amount: 0.3, ease: "power1.inOut" },
             ease: "power2.out",
             scrollTrigger: {
               trigger: section,
               start: "top 92%",
-              end: "top 40%",
-              scrub: 0.8,
+              end: "top 25%",
+              scrub: true,
               invalidateOnRefresh: true,
             },
           });
         }
+
+        /* ── EXIT: zoom out + fade when section is almost off the top ──
+           Scrubbed so scrolling back UP reverses it (zooms back in). ── */
+        gsap.to(section, {
+          opacity: 0,
+          y: -45,
+          scale: 0.92,
+          immediateRender: false,
+          ease: "power2.in",
+          scrollTrigger: {
+            trigger: section,
+            start: "bottom 10%",
+            end: "bottom -5%",
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
       });
     });
 
@@ -275,7 +305,7 @@ export default function Portfolio() {
       "--glow-color": "#06b6d4",
       ease: "none",
       scrollTrigger: {
-        trigger: ".portfolio-root",
+        trigger: containerRef.current,
         start: "top top",
         end: "bottom bottom",
         scrub: true,
@@ -309,6 +339,32 @@ export default function Portfolio() {
         {/* 3D background canvas */}
         <div className="background-layer">
           <MernUniverse />
+        </div>
+
+        {/* Animated background mesh grid */}
+        <div className="bg-mesh" />
+
+        {/* Animated floating orbs */}
+        <div className="bg-orb bg-orb-1" />
+        <div className="bg-orb bg-orb-2" />
+        <div className="bg-orb bg-orb-3" />
+        <div className="bg-orb bg-orb-4" />
+        <div className="bg-orb bg-orb-5" />
+
+        {/* Floating particles */}
+        <div className="bg-particles">
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={i}
+              className="bg-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDuration: `${8 + Math.random() * 16}s`,
+                animationDelay: `${Math.random() * 12}s`,
+                '--dx': `${(Math.random() - 0.5) * 100}px`,
+              }}
+            />
+          ))}
         </div>
 
         {/* Film grain overlay */}

@@ -11,20 +11,19 @@ export default function CinematicWrapper({ children }) {
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
 
-    /* ── Lenis smooth scroll — enabled on ALL devices for consistent UX ── */
+    /* ── Lenis smooth scroll — enabled on ALL devices ── */
     const lenis = new Lenis({
-      /* Mobile: shorter duration for responsiveness */
-      duration: isMobile ? 0.85 : 1.2,
+      duration: isMobile ? 1.0 : 1.3,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      /* Mobile: higher multiplier so scrolling doesn't feel sluggish */
-      wheelMultiplier: isMobile ? 1.2 : 0.9,
-      touchMultiplier: isMobile ? 2.2 : 1.8,
+      smoothTouch: false,   // Lenis touch smoothing competes with snap-scroll
+      wheelMultiplier: isMobile ? 1.0 : 1.0,
+      touchMultiplier: isMobile ? 1.8 : 1.8,
       infinite: false,
-      /* lerp: momentum interpolation — keep low for crisp GSAP scrub */
-      lerp: isMobile ? 0.15 : 0.1,
+      /* lerp: keep low so GSAP scrub feels accurate */
+      lerp: isMobile ? 0.12 : 0.08,
     });
 
     /* Expose globally so modals / carousel can stop/start Lenis */
