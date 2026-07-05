@@ -11,6 +11,10 @@ import {
 import React, { useRef, useEffect, useState } from 'react';
 import ahishAvatar from '../assets/ME1.png';
 import '../styles/About.css';
+import { 
+  ReactIcon, TypeScriptRealIcon, NodeIcon, ExpressIcon, 
+  MongoRealIcon, PythonIcon, GitIcon 
+} from './ui/Icons';
 
 /* ═══════════════════════════════════════════
    WORD-BY-WORD TEXT REVEAL
@@ -93,14 +97,16 @@ function AnimatedCounter({ target, suffix = '' }) {
 function FloatingPhone() {
   const containerRef = useRef(null);
   
-  // Motion values for rotation (default rotation is X=15, Y=-30)
+  // Motion values for rotation (start at 330 for a 360-deg entrance spin)
   const rotateXVal = useMotionValue(15);
-  const rotateYVal = useMotionValue(-30);
+  const rotateYVal = useMotionValue(330);
   
   // Smooth spring configuration for interactive mouse tilt
   const springConfig = { damping: 22, stiffness: 100, mass: 0.6 };
   const rX = useSpring(rotateXVal, springConfig);
   const rY = useSpring(rotateYVal, springConfig);
+
+  const inView = useInView(containerRef, { once: true, margin: "-150px 0px" });
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -110,6 +116,12 @@ function FloatingPhone() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (inView) {
+      animate(rotateYVal, -30, { duration: 2.2, ease: [0.16, 1, 0.3, 1] });
+    }
+  }, [inView, rotateYVal]);
 
   const handleMouseMove = (e) => {
     if (isMobile) return;
@@ -150,8 +162,8 @@ function FloatingPhone() {
         className="fp-phone-container"
         style={{
           transformStyle: 'preserve-3d',
-          rotateX: isMobile ? 15 : rX,
-          rotateY: isMobile ? -30 : rY,
+          rotateX: rX,
+          rotateY: rY,
         }}
       >
         {/* Colored shadow behind phone */}
@@ -340,16 +352,18 @@ export default function About() {
   ];
 
   const skills = [
-    { icon: '⚛️', label: 'React',   color: '#61DAFB', delay: 0.05 },
-    { icon: '🟢', label: 'Node.js', color: '#22c55e', delay: 0.10 },
-    { icon: '🍃', label: 'Mongo',   color: '#47A248', delay: 0.15 },
-    { icon: '🐍', label: 'Python',  color: '#3776AB', delay: 0.20 },
-    { icon: '🤖', label: 'AI/ML',   color: '#a855f7', delay: 0.25 },
-    { icon: '💙', label: 'Flutter', color: '#54C5F8', delay: 0.30 },
+    { icon: <ReactIcon width="24" height="24" />, label: 'React', color: '#61DAFB', delay: 0.05 },
+    { icon: <TypeScriptRealIcon width="24" height="24" />, label: 'TypeScript', color: '#3178C6', delay: 0.10 },
+    { icon: <NodeIcon width="24" height="24" />, label: 'Node.js', color: '#22c55e', delay: 0.15 },
+    { icon: <ExpressIcon width="24" height="24" />, label: 'Express.js', color: '#ffffff', delay: 0.20 },
+    { icon: <MongoRealIcon width="24" height="24" />, label: 'MongoDB', color: '#47A248', delay: 0.25 },
+    { icon: <PythonIcon width="24" height="24" />, label: 'Python', color: '#3776AB', delay: 0.30 },
+    { icon: <ReactIcon width="24" height="24" />, label: 'React Native', color: '#54C5F8', delay: 0.35 },
+    { icon: <GitIcon width="24" height="24" />, label: 'Git', color: '#F05032', delay: 0.40 },
   ];
 
-  const disciplines = ['Full-Stack Development', 'Artificial Intelligence', 'Cross-Platform Apps'];
-  const focusAreas  = ['User Experience Design', 'Cloud Integration', 'Real-time Systems'];
+  const disciplines = ['Full-Stack Web Development', 'MERN Stack Applications', 'Artificial Intelligence'];
+  const focusAreas  = ['Scalable Architectures', 'Frontend User Experience', 'Cross-Platform Mobile Apps'];
 
   return (
     <section className="abt-section" ref={sectionRef}>
@@ -446,7 +460,7 @@ export default function About() {
           <div className="abt-body">
             <p>
               <WordReveal
-                text="I am an AI & Data Science student at the intersection of"
+                text="I am a final-year B.Tech student in Artificial Intelligence and Data Science with a strong interest in"
                 delay={0.2}
               />
               {' '}
@@ -457,10 +471,9 @@ export default function About() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.9 }}
               >
-                intelligent systems
+                Full Stack and Frontend Development
               </motion.span>
-              {' '}
-              <WordReveal text="and" delay={1.0} />
+              <WordReveal text=". I enjoy building responsive, scalable, and user-friendly web applications using the" delay={1.0} />
               {' '}
               <motion.span
                 className="abt-highlight"
@@ -469,13 +482,14 @@ export default function About() {
                 viewport={{ once: true }}
                 transition={{ delay: 1.1 }}
               >
-                high-performance web architecture
+                MERN stack
               </motion.span>
-              <WordReveal text="." delay={1.2} />
+              {' '}
+              <WordReveal text="while continuously exploring AI technologies." delay={1.2} />
             </p>
             <p>
               <WordReveal
-                text="My focus is on building scalable MERN stack applications and mobile solutions that prioritize user experience and technical integrity."
+                text="I have developed multiple web applications using React, Node.js, Express.js, and MongoDB, along with cross-platform mobile applications using React Native. I enjoy solving real-world problems through clean code, intuitive interfaces, and efficient backend systems."
                 delay={0.35}
               />
             </p>
@@ -491,8 +505,8 @@ export default function About() {
           {/* Stats */}
           <div className="abt-stats">
             <StatCard value={15} suffix="+" label="Projects Built" delay={0.1} />
-            <StatCard value={5}  suffix="+" label="Tech Stacks"    delay={0.2} />
-            <StatCard value={2}  suffix="+" label="Years Coding"   delay={0.3} />
+            <StatCard value={10} suffix="+" label="Technologies" delay={0.2} />
+            <StatCard value={2}  suffix="+" label="Years Learning" delay={0.3} />
           </div>
 
           {/* Skills */}

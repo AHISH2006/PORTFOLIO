@@ -1,223 +1,335 @@
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import '../styles/Contact.css';
 
-/* ── Inline SVG icons (no Font Awesome dependency needed) ── */
-const IconEmail = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="4" width="20" height="16" rx="2"/>
-    <polyline points="2,4 12,13 22,4"/>
-  </svg>
-);
+/* ── Typing Effect Hook ── */
+function useTypingEffect(text, speed = 40, start = true) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (!start) { setDisplayed(''); setDone(false); return; }
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) { clearInterval(id); setDone(true); }
+    }, speed);
+    return () => clearInterval(id);
+  }, [text, speed, start]);
+  return { displayed, done };
+}
 
-const IconPhone = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.37a16 16 0 0 0 5.54 5.54l1.21-1.21a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
-  </svg>
-);
+/* ── Blink Cursor ── */
+function Cursor({ visible = true }) {
+  return <span className="terminal-cursor" style={{ opacity: visible ? 1 : 0 }}>▌</span>;
+}
 
-const IconLocation = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-    <circle cx="12" cy="10" r="3"/>
-  </svg>
-);
-
-const IconLinkedIn = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect x="2" y="9" width="4" height="12"/>
-    <circle cx="4" cy="4" r="2"/>
-  </svg>
-);
-
-const IconGitHub = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-  </svg>
-);
-
-/* ── 3D Tilt Wrapper ── */
-function TiltCard({ children, className }) {
-  const [transform, setTransform] = useState('perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)');
-  
-  const handleMouseMove = (e) => {
-    // Disable tilt on mobile/touch screens to avoid weird jumping or touch issues
-    const supportsHover = window.matchMedia('(hover: hover)').matches;
-    if (!supportsHover) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    // Calculate rotation (-10 to 10 degrees)
-    const rotateX = ((centerY - y) / centerY) * 10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-    
-    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02) translateZ(10px)`);
-  };
-
-  const handleMouseLeave = () => {
-    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0)');
-  };
-
+/* ── Terminal Line ── */
+function TermLine({ prompt = '>', text, color, dimmed, delay = 0, onDone }) {
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setActive(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+  const { displayed, done } = useTypingEffect(text, 28, active);
+  useEffect(() => { if (done && onDone) onDone(); }, [done]);
   return (
-    <div 
-      className={className}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ transform, transition: 'transform 0.15s ease-out', transformStyle: 'preserve-3d' }}
-    >
-      <div style={{ transform: 'translateZ(20px)' }}>
-        {children}
-      </div>
+    <div className={`term-line ${dimmed ? 'term-dimmed' : ''}`} style={{ color }}>
+      {prompt && <span className="term-prompt">{prompt}&nbsp;</span>}
+      <span>{displayed}</span>
+      {active && !done && <Cursor />}
     </div>
   );
 }
 
-const CONTACT_INFO = [
-  { icon: <IconEmail />,    title: 'Email',    value: 'anuahish249@gmail.com' },
-  { icon: <IconPhone />,   title: 'Phone',    value: '+91 63747 66056'       },
-  { icon: <IconLocation />, title: 'Location', value: 'Coimbatore, India'    },
-];
-
+/* ── Main Contact Component ── */
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSending,   setIsSending]   = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [step, setStep] = useState(0);           // controls reveal steps
+  const [activeField, setActiveField] = useState(null);
+  const [outputLines, setOutputLines] = useState([]);
+  const termRef = useRef(null);
+  const sectionRef = useRef(null);
+
+  // Intersection observer — triggers boot when terminal is fully in view
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    // Use threshold 0.9 so it must be fully scrolled down to trigger
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setStep(s => Math.max(s, 1)); },
+      { threshold: 0.9, rootMargin: '0px 0px 0px 0px' }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSending(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setIsSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setIsSubmitted(false), 5000);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSending(false);
+    setOutputLines([]);
+
+    // 1. Initial terminal output
+    const initialLines = [
+      { text: `> Initiating transmission...`, color: '#22d3ee' },
+      { text: `> Routing to destination: anuahish249@gmail.com`, color: '#94a3b8' },
+      { text: `> Payload: "${formData.message.slice(0, 32)}${formData.message.length > 32 ? '...' : ''}"`, color: '#94a3b8' },
+      { text: `> Encryption: AES-256`, color: '#94a3b8' }
+    ];
+
+    for (let i = 0; i < initialLines.length; i++) {
+      await new Promise(r => setTimeout(r, 400));
+      setOutputLines(prev => [...prev, initialLines[i]]);
     }
+
+    // 2. Call backend API
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: 'Message from Portfolio Contact Form',
+          message: formData.message
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to send');
+
+      setOutputLines(prev => [...prev, { text: `> Status: SIGNAL_RECEIVED ✓`, color: '#22c55e' }]);
+    } catch (error) {
+      setOutputLines(prev => [...prev, { text: `> Error: TRANSMISSION_FAILED ✗`, color: '#ef4444' }]);
+      console.error(error);
+    }
+
+    await new Promise(r => setTimeout(r, 500));
+    setIsSubmitted(true);
+    setIsSending(false);
+    setFormData({ name: '', email: '', message: '' });
+    setTimeout(() => { setIsSubmitted(false); setOutputLines([]); }, 7000);
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
-    <section className="contact-container">
-      <div className="contact-header reveal-child">
-        <h2 className="contact-title">
-          TRANSMIT <span style={{ color: '#06b6d4' }}>SIGNAL</span>
+    <section ref={sectionRef} className="contact-container" id="contact">
+
+      {/* ── Section Heading ── */}
+      <motion.div
+        className="contact-section-header"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span className="contact-overline">Get In Touch</span>
+        <h2 className="contact-heading">
+          <span className="contact-heading-static">OPEN</span>{' '}
+          <span className="contact-heading-accent">CHANNEL</span>
         </h2>
-        <p className="contact-subtitle">
-          Ready to sync orbits or initiate a collaboration? Send a transmission below.
+        <p className="contact-heading-sub">
+          Send a transmission — I respond within 24 hours.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="contact-grid">
-        {/* Info Side */}
-        <div className="contact-info-side">
-          {CONTACT_INFO.map((info, i) => (
-            <div key={info.title} className="reveal-child">
-              <TiltCard className="contact-info-card">
-                <div className="contact-info-icon-wrapper">
-                  {info.icon}
-                </div>
-                <div>
-                  <h4 className="contact-info-label">{info.title}</h4>
-                  <p className="contact-info-value">{info.value}</p>
-                </div>
-              </TiltCard>
-            </div>
-          ))}
-
-          <div className="contact-socials reveal-child">
-            <div className="contact-social-list">
-              <a
-                href="https://linkedin.com/in/ahish-sm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-social-btn"
-              >
-                <IconLinkedIn />
-                LinkedIn
-              </a>
-              <a
-                href="https://github.com/AHISH2006"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-social-btn"
-              >
-                <IconGitHub />
-                GitHub
-              </a>
-            </div>
+      {/* ── Terminal Window ── */}
+      <motion.div
+        className="terminal-window"
+        initial={{ opacity: 0, y: 60, scale: 0.97 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+      >
+        {/* Title Bar */}
+        <div className="terminal-titlebar">
+          <div className="terminal-dots">
+            <span className="tdot tdot-red" />
+            <span className="tdot tdot-yellow" />
+            <span className="tdot tdot-green" />
           </div>
+          <span className="terminal-title-text">ahish_sm@portfolio:~/contact</span>
+          <span className="terminal-pill">SECURE CHANNEL</span>
         </div>
 
-        {/* Form Side */}
-        <form
-          onSubmit={handleSubmit}
-          className="contact-form reveal-child"
-        >
-          <div className="contact-form-group">
-            <label className="contact-form-label">Identification</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="contact-form-input"
-              placeholder="Your Name"
-              required
-            />
-          </div>
+        {/* Terminal Body */}
+        <div className="terminal-body" ref={termRef}>
 
-          <div className="contact-form-group">
-            <label className="contact-form-label">Communication Frequency</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="contact-form-input"
-              placeholder="Email Address"
-              required
-            />
-          </div>
-
-          <div className="contact-form-group">
-            <label className="contact-form-label">Transmission Payload</label>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleInputChange}
-              className="contact-form-textarea"
-              placeholder="Your Message..."
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSending}
-            className="contact-submit-btn"
-          >
-            {isSending ? 'Initiating Transmission...' : 'Transmit Message'}
-          </button>
-
-          {isSubmitted && (
-            <div className="contact-success-msg">
-              SIGNAL RECEIVED. RESPONSE INBOUND.
+          {/* Boot lines */}
+          {step >= 1 && (
+            <div className="term-boot-block">
+              <TermLine prompt="$" text="ssh contact@ahish.dev --protocol=MERN" color="#22d3ee" delay={0} onDone={() => setStep(s => Math.max(s, 2))} />
             </div>
           )}
-        </form>
-      </div>
+          {step >= 2 && (
+            <div className="term-boot-block">
+              <TermLine prompt="" text="Connected to ahish.dev. Welcome." color="#22c55e" delay={100} />
+              <TermLine prompt="" text="Transmission relay online. All fields required." color="#64748b" delay={600} onDone={() => setStep(s => Math.max(s, 3))} />
+            </div>
+          )}
+
+          {/* Info Cards */}
+          {step >= 3 && (
+            <motion.div className="terminal-info-grid"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}>
+              {[
+                { label: 'EMAIL', value: 'anuahish249@gmail.com', icon: '✉' },
+                { label: 'PHONE', value: '+91 63747 66056', icon: '☎' },
+                { label: 'LOCATION', value: 'Coimbatore, India', icon: '◉' },
+              ].map((info, i) => (
+                <div key={info.label} className="terminal-info-card" style={{ animationDelay: `${i * 120}ms` }}>
+                  <span className="terminal-info-icon">{info.icon}</span>
+                  <div>
+                    <div className="terminal-info-label">{info.label}</div>
+                    <div className="terminal-info-value">{info.value}</div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Divider */}
+          {step >= 3 && <div className="terminal-hr" />}
+
+          {/* Form section */}
+          {step >= 3 && (
+            <motion.form
+              onSubmit={handleSubmit}
+              className="terminal-form"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <div className="term-prompt-line">
+                <span className="term-prompt-sym">~/contact $</span>
+                <span className="term-prompt-cmd"> init_transmission</span>
+              </div>
+
+              {/* Name */}
+              <div className={`terminal-field-group ${activeField === 'name' ? 'is-active' : ''}`}>
+                <label className="terminal-field-label">
+                  <span className="tfl-sym">[ARG_1]</span> SENDER_IDENTIFICATION
+                </label>
+                <div className="terminal-input-wrap">
+                  <span className="terminal-input-arrow">→</span>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onFocus={() => setActiveField('name')}
+                    onBlur={() => setActiveField(null)}
+                    className="terminal-input"
+                    placeholder="enter_your_name"
+                    required
+                    autoComplete="off"
+                  />
+                  {activeField === 'name' && <Cursor />}
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className={`terminal-field-group ${activeField === 'email' ? 'is-active' : ''}`}>
+                <label className="terminal-field-label">
+                  <span className="tfl-sym">[ARG_2]</span> COMMUNICATION_FREQ
+                </label>
+                <div className="terminal-input-wrap">
+                  <span className="terminal-input-arrow">→</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onFocus={() => setActiveField('email')}
+                    onBlur={() => setActiveField(null)}
+                    className="terminal-input"
+                    placeholder="your@email.address"
+                    required
+                    autoComplete="off"
+                  />
+                  {activeField === 'email' && <Cursor />}
+                </div>
+              </div>
+
+              {/* Message */}
+              <div className={`terminal-field-group ${activeField === 'message' ? 'is-active' : ''}`}>
+                <label className="terminal-field-label">
+                  <span className="tfl-sym">[ARG_3]</span> PAYLOAD_CONTENT
+                </label>
+                <div className="terminal-input-wrap terminal-textarea-wrap">
+                  <span className="terminal-input-arrow">→</span>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    onFocus={() => setActiveField('message')}
+                    onBlur={() => setActiveField(null)}
+                    className="terminal-input terminal-textarea"
+                    placeholder="type_your_message_here..."
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button type="submit" disabled={isSending} className="terminal-submit">
+                <span className="terminal-submit-prefix">$</span>
+                <span>{isSending ? 'transmit --status=sending...' : 'transmit --send'}</span>
+                <span className="terminal-submit-blink">█</span>
+              </button>
+
+              {/* Output lines */}
+              <AnimatePresence>
+                {outputLines.length > 0 && (
+                  <motion.div className="terminal-output"
+                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0 }}>
+                    {outputLines.map((line, i) => (
+                      <div key={i} className="terminal-output-line" style={{ color: line.color, animationDelay: `${i * 0.1}s` }}>
+                        {line.text}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Success */}
+              <AnimatePresence>
+                {isSubmitted && (
+                  <motion.div className="terminal-success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}>
+                    <span className="terminal-success-icon">✓</span>
+                    SIGNAL_RECEIVED :: RESPONSE_INBOUND
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.form>
+          )}
+
+          {/* Social links */}
+          {step >= 3 && (
+            <motion.div className="terminal-socials"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+              <span className="term-prompt-sym">~/contact $</span>
+              <span className="term-prompt-cmd"> ls ./networks</span>
+              <div className="terminal-social-links">
+                <a href="https://linkedin.com/in/ahishsm" target="_blank" rel="noopener noreferrer" className="terminal-social-link">
+                  <span className="tsl-bullet">▶</span> linkedin.com/in/ahishsm
+                </a>
+                <a href="https://github.com/AHISH2006" target="_blank" rel="noopener noreferrer" className="terminal-social-link">
+                  <span className="tsl-bullet">▶</span> github.com/AHISH2006
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
     </section>
   );
 }

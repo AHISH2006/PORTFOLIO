@@ -49,7 +49,7 @@ export default function Experience() {
           trigger: '.exp-timeline',
           start: 'top 65%',
           end: 'bottom 35%',
-          scrub: 1.2,
+          scrub: true,
         }
       }
     );
@@ -102,7 +102,7 @@ export default function Experience() {
             trigger: wrap,
             start: 'top 80%',
             end: 'top 45%',
-            scrub: 1.2,
+            scrub: true,
             toggleActions: 'play none none reverse',
           }
         }

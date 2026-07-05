@@ -1,0 +1,35 @@
+/* ── Global Cursor Reset ── */
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* ── Custom Cursor Elements ── */
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, background-color, border-color;
+  transform-origin: center;
+  mix-blend-mode: screen;
+}
+
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  will-change: transform, background-color;
+  transform-origin: center;
+}

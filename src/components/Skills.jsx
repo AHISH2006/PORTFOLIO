@@ -1,6 +1,12 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Code, Target, Database, Wrench } from 'lucide-react';
+import {
+  PythonIcon, JavaScriptIcon, TypeScriptRealIcon, SQLIcon,
+  ReactIcon, HtmlIcon, FramerMotionIcon, NodeIcon, ExpressIcon,
+  MongoRealIcon, GitHubIcon, VsCodeIcon, FigmaIcon, VercelIcon, ExpoIcon,
+  GenericCodeIcon
+} from './ui/Icons';
 import '../styles/Skills.css';
 
 /* ─────────────────────────────────────────
@@ -17,10 +23,10 @@ const SKILL_CATEGORIES = [
     icon: Code,
     desc: 'Core languages for building robust, high-performance systems and dynamic interfaces.',
     skills: [
-      { name: 'Python', level: 95, icon: '🐍' },
-      { name: 'JavaScript', level: 92, icon: '⚡' },
-      { name: 'TypeScript', level: 88, icon: '🔷' },
-      { name: 'SQL', level: 85, icon: '🗄️' },
+      { name: 'Python', level: 95, icon: <PythonIcon width="20" height="20" /> },
+      { name: 'JavaScript', level: 92, icon: <JavaScriptIcon width="20" height="20" /> },
+      { name: 'TypeScript', level: 88, icon: <TypeScriptRealIcon width="20" height="20" /> },
+      { name: 'SQL', level: 85, icon: <SQLIcon width="20" height="20" /> },
     ],
     radarPoints: [95, 92, 88, 85, 90, 80],
     tags: ['OOP', 'Functional', 'Async', 'Type Safety'],
@@ -35,10 +41,10 @@ const SKILL_CATEGORIES = [
     icon: Target,
     desc: 'Creating immersive, responsive, and cinematic user interfaces with modern tech.',
     skills: [
-      { name: 'React', level: 95, icon: '⚛️' },
-      { name: 'HTML5 / CSS3', level: 90, icon: '🎨' },
-      { name: 'React Native', level: 85, icon: '📱' },
-      { name: 'Framer Motion', level: 88, icon: '🎬' },
+      { name: 'React', level: 95, icon: <ReactIcon width="20" height="20" /> },
+      { name: 'HTML5 / CSS3', level: 90, icon: <HtmlIcon width="20" height="20" /> },
+      { name: 'React Native', level: 85, icon: <ReactIcon width="20" height="20" /> },
+      { name: 'Framer Motion', level: 88, icon: <FramerMotionIcon width="20" height="20" /> },
     ],
     radarPoints: [85, 95, 90, 85, 88, 92],
     tags: ['Animations', 'Responsive', 'Accessibility', 'PWA'],
@@ -53,10 +59,10 @@ const SKILL_CATEGORIES = [
     icon: Database,
     desc: 'Architecting secure, scalable server-side applications and efficient RESTful APIs.',
     skills: [
-      { name: 'Node.js', level: 88, icon: '🟢' },
-      { name: 'Express.js', level: 85, icon: '🚀' },
-      { name: 'REST API', level: 90, icon: '🔗' },
-      { name: 'MongoDB', level: 82, icon: '🍃' },
+      { name: 'Node.js', level: 88, icon: <NodeIcon width="20" height="20" /> },
+      { name: 'Express.js', level: 85, icon: <ExpressIcon width="20" height="20" /> },
+      { name: 'REST API', level: 90, icon: <GenericCodeIcon width="20" height="20" /> },
+      { name: 'MongoDB', level: 82, icon: <MongoRealIcon width="20" height="20" /> },
     ],
     radarPoints: [80, 85, 88, 90, 85, 82],
     tags: ['REST', 'Auth', 'NoSQL', 'Middleware'],
@@ -71,10 +77,10 @@ const SKILL_CATEGORIES = [
     icon: Wrench,
     desc: 'Leveraging modern development workflows, CI/CD pipelines, and design tooling.',
     skills: [
-      { name: 'Git / GitHub', level: 92, icon: '🐙' },
-      { name: 'VS Code', level: 95, icon: '💻' },
-      { name: 'Figma', level: 85, icon: '🎯' },
-      { name: 'Vercel / Expo', level: 88, icon: '☁️' },
+      { name: 'Git / GitHub', level: 92, icon: <GitHubIcon width="20" height="20" /> },
+      { name: 'VS Code', level: 95, icon: <VsCodeIcon width="20" height="20" /> },
+      { name: 'Figma', level: 85, icon: <FigmaIcon width="20" height="20" /> },
+      { name: 'Vercel / Expo', level: 88, icon: <VercelIcon width="20" height="20" /> },
     ],
     radarPoints: [90, 88, 85, 92, 95, 85],
     tags: ['CI/CD', 'Docker', 'Design', 'Cloud'],
