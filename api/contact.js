@@ -68,7 +68,7 @@
     } catch (error) {
       // This will now log the SPECIFIC error from Nodemailer/Google
       console.error("NODEMAILER ERROR:", error);
-      return res.status(500).json({ messagAe: "Failed to send email" });
+      return res.status(500).json({ message: "Failed to send email" });
     }
   }
 
