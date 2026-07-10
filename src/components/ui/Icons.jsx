@@ -1,24 +1,33 @@
 import React from 'react';
+import { 
+  FaReact, FaPython, FaHtml5, FaCss3Alt, FaNodeJs, 
+  FaGitAlt, FaGithub, FaFigma, FaDatabase 
+} from 'react-icons/fa';
+import { 
+  SiTypescript, SiJavascript, SiExpress, SiMongodb, 
+  SiExpo, SiFramer, SiVercel 
+} from 'react-icons/si';
+import { VscVscode } from 'react-icons/vsc';
 
-export const ReactIcon = (props) => <svg viewBox="-11.5 -10.23 23 20.46" {...props}><circle cx="0" cy="0" r="2.05" fill="currentColor"/><g stroke="currentColor" strokeWidth="1.3" fill="none"><ellipse rx="11" ry="4.2"/><ellipse rx="11" ry="4.2" transform="rotate(60)"/><ellipse rx="11" ry="4.2" transform="rotate(120)"/></g></svg>;
-export const TypeScriptIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M1.5 0h21l-1.9 21.5L12 24l-8.6-2.5L1.5 0zm9.6 15.6l-5.1-1.4-.4-4.2h12.5l.3-3.3H5.2L4.8 3h14.8l-1.3 14.2-6.3 1.8-6-1.7-.2-2.1h3.2l.1 1.2 3.1.9 3.2-.9.4-4.8H5.9l.2 2h9.6l-.3 3.3z"/></svg>; /* Note: this is HTML5 icon actually, let me use a generic TS one or text for now, wait I don't have TS SVG in Hero. Let me provide a real TS icon. */
-export const TypeScriptRealIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0H1.125zM12.24 17.156c-1.353 0-2.327-.373-3.023-1.045l1.044-1.493c.538.448 1.18.732 1.956.732.612 0 1.015-.224 1.015-.553 0-.358-.314-.523-1.344-.762-1.747-.418-2.612-1.105-2.612-2.314 0-1.284 1.045-2.284 2.762-2.284 1.15 0 2.06.328 2.657.806l-.97 1.478c-.463-.359-1.015-.553-1.583-.553-.612 0-1.015.224-1.015.552 0 .328.298.507 1.343.76 1.761.433 2.612 1.15 2.612 2.344 0 1.298-1.045 2.33-2.836 2.33zM20.25 22h-11v-1.637h4.373v-9.613h-4.373v-1.637h11v1.637h-4.373v9.613h4.373V22z"/></svg>;
-export const NodeIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M11.875 0L1.766 5.833V17.5L11.875 23.333L21.984 17.5V5.833L11.875 0ZM10.59 18.067V10.297L6.442 12.687V17.502L5.05 16.697V11.884L10.59 8.685V18.067ZM18.96 16.697L13.42 19.896V10.514L17.568 8.124V3.309L18.96 4.114V16.697ZM17.568 17.502L11.875 20.785L6.182 17.502V14.184L11.875 17.468L17.568 14.184V17.502Z"/></svg>;
-export const ExpressIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.176 17h-2.45l-1.92-3.15H12.7V17h-2.43v-9.5h2.43v4h.1l1.83-4h2.4l-3 4.8 3.146 4.7z"/></svg>;
-export const MongoIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M11.57 14.85c-.32-.23-.7-.41-1.13-.53l-.2-.05V12.1l.3.09c.36.12.67.31.91.56l1.45-1.92c-.68-.61-1.52-1.05-2.48-1.3V5H7.27v14h3.18v-2.31c.42.36.93.63 1.5.8l.22.06v-2.18l-.34-.11c-.34-.1-.64-.26-.88-.47l-1.42 1.89c.77.71 1.76 1.19 2.87 1.39l.3.05V19h3.18c.95 0 1.83-.24 2.62-.68l-1.47-1.93c-.34.25-.72.44-1.14.56l-.23.06V14.8l.34.1c.34.1.64.26.88.47l1.42-1.89c-.77-.71-1.76-1.19-2.87-1.39l-.3-.05V5h-3.18v14h3.18v-2.31c-.42-.36-.93-.63-1.5-.8l-.22-.06v2.18l.34.11z" fill="currentColor"/></svg>; /* Wait, Mongo SVG in Hero wasn't quite this, let me re-check */
-export const MongoRealIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M11.57 14.85c-.32-.23-.7-.41-1.13-.53l-.2-.05V12.1l.3.09c.36.12.67.31.91.56l1.45-1.92c-.68-.61-1.52-1.05-2.48-1.3V5H7.27v14h3.18v-2.31c.42.36.93.63 1.5.8l.22.06v-2.18l-.34-.11c-.34-.1-.64-.26-.88-.47l-1.42 1.89c.77.71 1.76 1.19 2.87 1.39l.3.05V19h3.18c.95 0 1.83-.24 2.62-.68l-1.47-1.93c-.34.25-.72.44-1.14.56l-.23.06V14.8l.34.1c.34.1.64.26.88.47l1.42-1.89c-.77-.71-1.76-1.19-2.87-1.39l-.3-.05V5h-3.18v14h3.18v-2.31c-.42-.36-.93-.63-1.5-.8l-.22-.06v2.18l.34.11z"/></svg>;
-export const PythonIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12 0c-3.1 0-5.8.5-6.5.6-.9.2-1.2.6-1.3 1.3-.1.8-.1 1.7-.1 2.5 0 .6.3 1.2.9 1.4.6.2 1.4.3 2.1.3v3c0 1.4 1 2.5 2.5 2.5h3.5V13H8.3c-1.3 0-2.4.9-2.5 2.1 0 .7-.1 1.4-.1 2 0 1.2 1 2.1 2.3 2.1h3.3v-1.6c0-1.6 1.3-2.9 2.9-2.9h3.8c1.6 0 2.9-1.3 2.9-2.9V6.1c0-1.6-1.3-2.9-2.9-2.9H13V1.6c0-.9-1.1-1.6-1-1.6zM9.5 2C9.8 2 10 2.2 10 2.5s-.2.5-.5.5-.5-.2-.5-.5.2-.5.5-.5zm5 17c.3 0 .5.2.5.5s-.2.5-.5.5-.5-.2-.5-.5.2-.5.5-.5z"/></svg>;
-export const GitIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M11.55 0L0 11.55l11.55 11.55L23.1 11.55 11.55 0zm5.1 12.3c-.9 0-1.6-.7-1.6-1.6 0-.3.1-.6.2-.8l-2.6-2.6c-.3.1-.6.2-.9.2s-.6-.1-.9-.2l-1.3 1.3c.1.3.2.6.2.9 0 .9-.7 1.6-1.6 1.6s-1.6-.7-1.6-1.6.7-1.6 1.6-1.6c.3 0 .6.1.8.2L10.3 7c-.1-.3-.2-.6-.2-.9 0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6c0 .3-.1.6-.2.9l2.6 2.6c.3-.1.6-.2.9-.2.9 0 1.6.7 1.6 1.6 0 .9-.7 1.6-1.6 1.6z"/></svg>;
-export const JavaScriptIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M0 0h24v24H0V0z" fill="none"/><path d="M3 3h18v18H3V3zm10.71 13.91c-.42-.31-.9-.55-1.45-.71V14.1c.36.13.68.32.96.56l1.24-1.63c-.6-.53-1.31-.93-2.11-1.18V5h-3.2v14h3.45c.87 0 1.65-.24 2.34-.73l-1.23-1.65zm-6.22-3.15h2.95v-1.6H7.44v1.6zm0-3.32h4.52V5.84H7.44v1.6zM15.42 19h3.45c.87 0 1.65-.24 2.34-.73l-1.23-1.65c-.42-.31-.9-.55-1.45-.71v-2.1c.36.13.68.32.96.56l1.24-1.63c-.6-.53-1.31-.93-2.11-1.18V5h-3.2v14z" fill="none"/><path d="M0 0h24v24H0z" fill="none"/><path d="M11.57 14.85c-.32-.23-.7-.41-1.13-.53l-.2-.05V12.1l.3.09c.36.12.67.31.91.56l1.45-1.92c-.68-.61-1.52-1.05-2.48-1.3V5H7.27v14h3.18v-2.31c.42.36.93.63 1.5.8l.22.06v-2.18l-.34-.11c-.34-.1-.64-.26-.88-.47l-1.42 1.89c.77.71 1.76 1.19 2.87 1.39l.3.05V19h3.18c.95 0 1.83-.24 2.62-.68l-1.47-1.93c-.34.25-.72.44-1.14.56l-.23.06V14.8l.34.1c.34.1.64.26.88.47l1.42-1.89c-.77-.71-1.76-1.19-2.87-1.39l-.3-.05V5h-3.18v14h3.18v-2.31c-.42-.36-.93-.63-1.5-.8l-.22-.06v2.18l.34.11z" fill="currentColor"/></svg>;
-export const SQLIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12 2C6.48 2 2 4.24 2 7v10c0 2.76 4.48 5 10 5s10-2.24 10-5V7c0-2.76-4.48-5-10-5zm0 18c-4.42 0-8-1.79-8-4v-1.42c2.14 1.52 5 2.42 8 2.42s5.86-.9 8-2.42V16c0 2.21-3.58 4-8 4zm8-6.19C17.93 15.19 15.15 16 12 16s-5.93-.81-8-2.19V11.5c2.08 1.43 4.93 2.5 8 2.5s5.92-1.07 8-2.5v2.31zM12 12C7.58 12 4 10.21 4 8s3.58-4 8-4 8 1.79 8 4-3.58 4-8 4z"/></svg>;
-export const HtmlIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M1.5 0h21l-1.9 21.5L12 24l-8.6-2.5L1.5 0zm9.6 15.6l-5.1-1.4-.4-4.2h12.5l.3-3.3H5.2L4.8 3h14.8l-1.3 14.2-6.3 1.8-6-1.7-.2-2.1h3.2l.1 1.2 3.1.9 3.2-.9.4-4.8H5.9l.2 2h9.6l-.3 3.3z"/></svg>;
-export const CssIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M1.5 0h21l-1.9 21.5L12 24l-8.6-2.5L1.5 0zm14.6 6.8l.2-2.7H5l.2 2.7h11.1zm-.2 2.7H5.4l.2 2.7h10.4l-.5 5.5-3.5 1-3.5-1-.2-2.8H5.5l.4 5.2 6.1 1.7 6.1-1.7.9-10z"/></svg>;
-export const VsCodeIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M17.5 0l-12 5.5L1 3.5 0 4l6.5 6L0 16l1 1 4.5-2 12 5.5V0zm-11 11L15 2v20L6.5 11z"/></svg>;
-export const GitHubIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>;
-export const FigmaIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M8 12c-2.2 0-4-1.8-4-4s1.8-4 4-4h4v8H8z"/><path d="M16 4c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4V4h4z"/><path d="M8 12h4v4H8c-2.2 0-4-1.8-4-4s1.8-4 4-4z"/><path d="M8 20c-2.2 0-4-1.8-4-4h4v4z"/><path d="M12 12h4c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4v-8z"/></svg>;
-export const VercelIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg>;
-export const ExpoIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12 0l11 6.35v11.3L12 24 1 17.65V6.35L12 0zm0 2.3l-9 5.2v10.4l9 5.2 9-5.2V7.5l-9-5.2zM8 7h8v2H8V7zm0 4h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>;
-export const FramerMotionIcon = (props) => <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg>;
+export const ReactIcon = (props) => <FaReact {...props} />;
+export const TypeScriptIcon = (props) => <SiTypescript {...props} />;
+export const TypeScriptRealIcon = (props) => <SiTypescript {...props} />;
+export const NodeIcon = (props) => <FaNodeJs {...props} />;
+export const ExpressIcon = (props) => <SiExpress {...props} />;
+export const MongoIcon = (props) => <SiMongodb {...props} />;
+export const MongoRealIcon = (props) => <SiMongodb {...props} />;
+export const PythonIcon = (props) => <FaPython {...props} />;
+export const GitIcon = (props) => <FaGitAlt {...props} />;
+export const JavaScriptIcon = (props) => <SiJavascript {...props} />;
+export const SQLIcon = (props) => <FaDatabase {...props} />;
+export const HtmlIcon = (props) => <FaHtml5 {...props} />;
+export const CssIcon = (props) => <FaCss3Alt {...props} />;
+export const VsCodeIcon = (props) => <VscVscode {...props} />;
+export const GitHubIcon = (props) => <FaGithub {...props} />;
+export const FigmaIcon = (props) => <FaFigma {...props} />;
+export const VercelIcon = (props) => <SiVercel {...props} />;
+export const ExpoIcon = (props) => <SiExpo {...props} />;
+export const FramerMotionIcon = (props) => <SiFramer {...props} />;
 
 // A generic default icon for fallbacks
 export const GenericCodeIcon = (props) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>;

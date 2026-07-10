@@ -1,6 +1,6 @@
-import React, { useRef, lazy, Suspense } from "react";
+import React, { useRef, lazy, Suspense, useMemo } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import { useGSAP } from "@gsap/react";
 
 import Hero from "../components/Hero";
@@ -14,10 +14,20 @@ import Navigation from "../components/Navigation";
 import MernUniverse from "../components/MernUniverse";
 import CinematicWrapper from "../components/ui/CinematicWrapper";
 
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Portfolio() {
   const containerRef = useRef(null);
+
+  /* Stable random particle values — useMemo prevents re-computation on re-renders */
+  const particles = useMemo(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      left: `${(i * 13 + 7) % 100}%`,
+      duration: `${8 + (i * 2.3) % 16}s`,
+      delay: `${(i * 1.7) % 12}s`,
+      dx: `${(i % 2 === 0 ? 1 : -1) * (20 + (i * 7) % 60)}px`,
+    })),
+  []);
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -300,24 +310,7 @@ export default function Portfolio() {
     const t3 = setTimeout(scheduleRefresh, 3000);
     const t4 = setTimeout(scheduleRefresh, 6000);
 
-    /* ── Border glow colour shift on scroll ── */
-    gsap.to(".scrolling-border-frame", {
-      "--glow-color": "#06b6d4",
-      ease: "none",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-      },
-      keyframes: {
-        "0%":   { "--glow-color": "#22c55e" },
-        "25%":  { "--glow-color": "#3b82f6" },
-        "50%":  { "--glow-color": "#a855f7" },
-        "75%":  { "--glow-color": "#f59e0b" },
-        "100%": { "--glow-color": "#06b6d4" },
-      }
-    });
+
 
     return () => {
       clearTimeout(t1);
@@ -351,17 +344,17 @@ export default function Portfolio() {
         <div className="bg-orb bg-orb-4" />
         <div className="bg-orb bg-orb-5" />
 
-        {/* Floating particles */}
+        {/* Floating particles — 8 stable particles (memoized, no per-render Math.random) */}
         <div className="bg-particles">
-          {Array.from({ length: 20 }, (_, i) => (
+          {particles.map(p => (
             <div
-              key={i}
+              key={p.id}
               className="bg-particle"
               style={{
-                left: `${Math.random() * 100}%`,
-                animationDuration: `${8 + Math.random() * 16}s`,
-                animationDelay: `${Math.random() * 12}s`,
-                '--dx': `${(Math.random() - 0.5) * 100}px`,
+                left: p.left,
+                animationDuration: p.duration,
+                animationDelay: p.delay,
+                '--dx': p.dx,
               }}
             />
           ))}

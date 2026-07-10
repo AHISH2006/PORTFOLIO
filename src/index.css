@@ -90,69 +90,73 @@ button {
   z-index: -3;
   overflow: hidden;
   pointer-events: none;
+  /* Contain prevents this layer from triggering full-page repaints */
+  contain: strict;
 }
 
-/* ── Animated Background Orbs ─────────────────────────── */
+/* ── Animated Background Orbs ───────────────────────────── */
 .bg-orb {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
   z-index: -2;
-  filter: blur(80px);
   will-change: transform;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
+  /* Contain layout so orbs don't trigger ancestor reflows */
+  contain: layout style;
 }
 
 .bg-orb-1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.04) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.06) 40%, transparent 65%);
   top: -200px;
   left: -200px;
   animation-name: orb-drift-1;
-  animation-duration: 18s;
+  /* Slower = fewer composite frames = less GPU work */
+  animation-duration: 40s;
 }
 
 .bg-orb-2 {
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, rgba(99,102,241,0.03) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, rgba(99,102,241,0.05) 40%, transparent 65%);
   bottom: -300px;
   right: -300px;
   animation-name: orb-drift-2;
-  animation-duration: 22s;
+  animation-duration: 45s;
 }
 
 .bg-orb-3 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(6,182,212,0.09) 0%, rgba(6,182,212,0.03) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(6,182,212,0.09) 0%, rgba(6,182,212,0.04) 40%, transparent 65%);
   top: 40%;
   left: 30%;
   animation-name: orb-drift-3;
-  animation-duration: 15s;
+  animation-duration: 35s;
 }
 
 .bg-orb-4 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.02) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.04) 40%, transparent 65%);
   top: 20%;
   right: 10%;
   animation-name: orb-drift-4;
-  animation-duration: 20s;
+  animation-duration: 42s;
 }
 
 .bg-orb-5 {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, rgba(245,158,11,0.02) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, rgba(245,158,11,0.03) 40%, transparent 65%);
   bottom: 20%;
   left: 15%;
   animation-name: orb-drift-5;
-  animation-duration: 25s;
+  animation-duration: 50s;
 }
 
 @keyframes orb-drift-1 {
@@ -187,7 +191,7 @@ button {
   100% { transform: translate(-40px, 60px) scale(0.95); }
 }
 
-/* ── Animated Mesh Grid Background ────────────────────── */
+/* ── Animated Mesh Grid Background ──────────────────────── */
 .bg-mesh {
   position: fixed;
   inset: 0;
@@ -197,9 +201,12 @@ button {
     linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
   background-size: 60px 60px;
-  animation: mesh-shift 30s ease-in-out infinite;
+  /* Slower shift = compositor does less work per second */
+  animation: mesh-shift 60s ease-in-out infinite;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(0,0,0,0.6) 0%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(0,0,0,0.6) 0%, transparent 100%);
+  /* Contain so shifting background doesn't invalidate ancestor layout */
+  contain: strict;
 }
 
 @keyframes mesh-shift {
@@ -215,6 +222,7 @@ button {
   z-index: -3;
   pointer-events: none;
   overflow: hidden;
+  contain: strict;
 }
 
 .bg-particle {
@@ -309,12 +317,12 @@ button {
   width: 150%;
   height: 150%;
   pointer-events: none;
-  /* z-index lowered from 9999 — was intercepting click events in some browsers */
   z-index: 200;
   opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  /* Animation removed — step animation was competing with canvas/GSAP RAF loops */
-  /* Static grain is still visually effective and uses zero GPU */
+  /* Static grain is visually effective and uses zero GPU */
+  /* contain:strict keeps this huge oversized div from causing full-page repaints */
+  contain: strict;
 }
 
 @keyframes grain {
@@ -421,6 +429,15 @@ button {
 
 @media (max-width: 768px) {
   .noise-overlay {
+    display: none;
+  }
+  .bg-orb {
+    display: none;
+  }
+  .bg-mesh {
+    animation: none;
+  }
+  .bg-particles {
     display: none;
   }
   /* Mobile sections use GSAP for entry + exit — no CSS override needed */

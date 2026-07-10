@@ -575,7 +575,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: -1; /* Behind text */
+  z-index: -1;
+  /* Limit repaint scope to this layer */
+  contain: layout style;
 }
 
 .hero-floating-icon {
@@ -583,8 +585,51 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 15px currentColor);
-  opacity: 0.85;
+  /* Compositor-only: no filter (drop-shadow forces rasterisation) */
+  opacity: 0.65;
+  will-change: transform;
+  /* Combine CSS keyframe + mouse-parallax offset in one transform */
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+}
+
+/* ── 6 float keyframe variants — staggered timings & paths —
+   Run on compositor thread (no JS). No layout properties touched. ── */
+.fi-float-a { animation: fi-kf-a 6s ease-in-out infinite; }
+.fi-float-b { animation: fi-kf-b 7s ease-in-out infinite 0.8s; }
+.fi-float-c { animation: fi-kf-c 8s ease-in-out infinite 1.6s; }
+.fi-float-d { animation: fi-kf-d 5.5s ease-in-out infinite 0.4s; }
+.fi-float-e { animation: fi-kf-e 9s ease-in-out infinite 2s; }
+.fi-float-f { animation: fi-kf-f 6.5s ease-in-out infinite 1.2s; }
+
+@keyframes fi-kf-a {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  25%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(6px, -18px) rotate(5deg); }
+  75%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-4px, -8px) rotate(-4deg); }
+}
+@keyframes fi-kf-b {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  30%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-8px, -22px) rotate(-6deg); }
+  70%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(5px, -10px) rotate(3deg); }
+}
+@keyframes fi-kf-c {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  40%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(10px, -16px) rotate(8deg); }
+  80%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-6px, -5px) rotate(-5deg); }
+}
+@keyframes fi-kf-d {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  35%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-10px, -20px) rotate(-7deg); }
+  65%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(7px, -12px) rotate(4deg); }
+}
+@keyframes fi-kf-e {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  45%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(8px, -24px) rotate(6deg); }
+  85%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-5px, -10px) rotate(-3deg); }
+}
+@keyframes fi-kf-f {
+  0%, 100% { transform: translate(var(--mx,0px), var(--my,0px)) translate(0px, 0px) rotate(0deg); }
+  20%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(-12px, -14px) rotate(-8deg); }
+  60%       { transform: translate(var(--mx,0px), var(--my,0px)) translate(6px, -20px) rotate(5deg); }
 }
 
 /* ── Stats Rows ── */
@@ -697,8 +742,9 @@
 @media (max-width: 768px) {
   .hero-container { padding: 8rem 1.5rem 6rem; min-height: 100svh; justify-content: space-between; }
   .hero-content { display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; transform: scale(1.05); transform-origin: center top; }
-  /* Optimize performance by removing heavy drop-shadow on moving elements */
-  .hero-floating-icon { filter: none; opacity: 0.5; }
+  /* Optimize performance by hiding floating icons entirely on mobile —
+     canvas already has ambient animation; DOM icons add layout cost */
+  .hero-floating-icons { display: none; }
   .hero-dcard { transform: scale(0.6); opacity: 0.5; }
   .hero-cursor-halo { display: none; }
   .hero-ring-xl { width: 280px; height: 280px; margin: -140px 0 0 -140px; }

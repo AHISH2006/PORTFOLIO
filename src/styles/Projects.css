@@ -155,7 +155,6 @@
   opacity: 0.6;
 }
 
-/* ── Left fixed panel (heading + nav) ── */
 .prj-hscroll-panel {
   position: relative;
   z-index: 10;
@@ -164,10 +163,8 @@
   height: 100%;
   display: flex;
   align-items: center;
-  border-right: 1px solid rgba(255,255,255,0.05);
-  background: rgba(2, 6, 23, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border-right: none;
+  background: transparent;
 }
 
 .prj-hscroll-panel-inner {

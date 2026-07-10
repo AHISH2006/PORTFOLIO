@@ -83,7 +83,7 @@ const PROJECTS = [
     architecture: 'React SPA with mock REST API for rapid prototyping.',
     role: 'Frontend Developer',
     achievements: ['Built complete assignment management flow','Implemented mock API integration','Created responsive dashboard'],
-    link: 'https://github.com/AHISH2006/Assignment-portal', github: 'https://github.com/AHISH2006/Assignment-portal',
+    link: 'https://ahish-task1.vercel.app/', github: 'https://github.com/AHISH2006/Assignment-portal',
     imageUrl: pro7, color: '#3b82f6', icon: '📚',
   },
   {
@@ -109,7 +109,7 @@ const PROJECTS = [
     architecture: 'MERN Stack with separated client/server structure.',
     role: 'Full-Stack Developer',
     achievements: ['Built end-to-end MERN application','Integrated crisis detection safety layer','Connected OpenAI API'],
-    link: 'https://github.com/AHISH2006/AI_Chatbot', github: 'https://github.com/AHISH2006/AI_Chatbot',
+    link: 'https://health-support-chatbot.vercel.app/', github: 'https://github.com/AHISH2006/AI_Chatbot',
     imageUrl: pro3, color: '#22c55e', icon: '🧠',
   },
   {
@@ -135,7 +135,7 @@ const PROJECTS = [
     architecture: 'SPA with modern tooling and optimised build pipeline.',
     role: 'Frontend Developer',
     achievements: ['Built modern SPA with React + Vite','Implemented responsive component design'],
-    link: 'https://github.com/AHISH2006/Vibex', github: 'https://github.com/AHISH2006/Vibex',
+    link: 'https://vibecx.vercel.app/', github: 'https://github.com/AHISH2006/Vibex',
     imageUrl: pro1, color: '#f97316', icon: '✨',
   },
   {
