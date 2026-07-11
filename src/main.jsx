@@ -1,7 +1,9 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App'
-import './index.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
+import App from "./App";
+import "./index.css";
+
 const originalWarn = console.warn;
 
 console.warn = (...args) => {
@@ -9,18 +11,19 @@ console.warn = (...args) => {
 
   if (
     typeof msg === "string" &&
-    (
-      msg.includes("THREE.Clock") ||
-      msg.includes("deprecated parameters")
-    )
+    (msg.includes("THREE.Clock") ||
+      msg.includes("deprecated parameters"))
   ) {
     return;
   }
 
   originalWarn(...args);
 };
-createRoot(document.getElementById('root')).render(
+
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
+  </StrictMode>
+);
